@@ -1,0 +1,33 @@
+{
+  "name": "advent-of-code",
+  "version": "1.0.0",
+  "description": "A place to have all the aoc challenges",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hugomosh/advent-of-code.git"
+  },
+  "keywords": [
+    "aoc"
+  ],
+  "author": "Hugo Mosh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hugomosh/advent-of-code/issues"
+  },
+  "homepage": "https://github.com/hugomosh/advent-of-code#readme",
+  "devDependencies": {
+    "@types/node": "^16.11.11",
+    "@types/shelljs": "^0.8.9",
+    "cheerio": "^1.0.0-rc.10",
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.15",
+    "shelljs": "^0.8.4",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  }
+}

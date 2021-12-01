@@ -1,4 +1,8 @@
+import getInput from "../../../utils/getInput";
+
 const part1 = () => {
+  const input = getInput(2020, 1);
+  console.log(input);
   return 1;
 };
 

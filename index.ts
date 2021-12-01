@@ -6,6 +6,7 @@ const { readdirSync, mkdirSync, existsSync, writeFileSync } = require("fs");
 import { downloadInputForYearAndDay, getPuzzleDescription } from "./utils/aoc-actions";
 import path from "path";
 import { cp } from "shelljs";
+import { getInputPath } from "./utils/getInput";
 
 const action = process.argv[2];
 const year = process.argv[3];
@@ -14,11 +15,6 @@ const day = process.argv[4];
 const getTsPath = (year: Number | String, day: Number | String) => {
   day = String(day);
   return `./ts/${year}/${day.padStart(2, "0")}`;
-};
-
-const getInputPath = (year: Number | String, day: Number | String) => {
-  day = String(day);
-  return [`./input/${year}`, `/${day.padStart(2, "0")}`, `.txt`];
 };
 
 const createFromTemplate = async () => {

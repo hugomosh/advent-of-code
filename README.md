@@ -9,3 +9,14 @@ I am going to solve the Aoc using TS. Ideally I want to do them in Rust or Dart 
 ## Read files
 
 From [tatupesonen/aoc-typescript-starter: Starter for TypeScript projects. Provides automatic input fetching & creating from a template.](https://github.com/tatupesonen/aoc-typescript-starter)
+
+```sh
+npm start create 2020 1
+
+```
+
+## Run the code
+
+```sh
+npm start run 2020 1
+```

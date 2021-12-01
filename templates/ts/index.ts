@@ -1,3 +1,5 @@
+import getInput from "../../../utils/getInput";
+
 const part1 = () => {
   return 1;
 };

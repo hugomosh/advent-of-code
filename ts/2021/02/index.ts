@@ -1,4 +1,4 @@
-import getInput from "../../../utils/getInput";
+import getInput, { readTestInputFile } from "../../../utils/getInput";
 
 const problem = {
   year: 2021,
@@ -66,15 +66,19 @@ class Submarine2 {
     return { depth, horizontal };
   }
 }
-const part1 = () => {
-  const input = getInput(problem.year, problem.day)
-    .split("\n")
-    .map((e) => {
-      const t = e.split(" ");
-      return [t[0], Number(t[1])];
-    });
 
-  return solvePart1(input);
+const parseInput = (input: string) => {
+  return input.split("\n").map((e) => {
+    const t = e.split(" ");
+    return [t[0], Number(t[1])];
+  });
+};
+
+const part1 = () => {
+  const input = getInput(problem.year, problem.day);
+  const parsed = parseInput(input);
+
+  return solvePart1(parsed);
 };
 
 function solvePart1(input: any): number {
@@ -110,19 +114,21 @@ const part2 = () => {
   return solvePart2(input);
 };
 const testPart1 = () => {
-  const input = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
-150
+  const input = readTestInputFile(problem.year, problem.day);
+  const parsed = parseInput(input);
+
   const expected = 150;
-  const actual = solvePart1(input);
-  console.assert(actual === expected, `${actual} vs the expected: ${expected}`);
+  const actual = solvePart1(parsed);
+  console.assert(actual === expected, `T1: ${actual} vs the expected: ${expected}`);
 };
 
 const testPart2 = () => {
-  const input = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
+  const input = readTestInputFile(problem.year, problem.day);
+  const parsed = parseInput(input);
 
   const expected = 900;
-  const actual = solvePart1(input);
-  console.assert(actual === expected, `${actual} vs the expected: ${expected}`);
+  const actual = solvePart2(parsed);
+  console.assert(actual === expected, `T2: ${actual} vs the expected: ${expected}`);
 };
 
 testPart1();

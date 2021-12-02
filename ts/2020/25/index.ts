@@ -1,8 +1,8 @@
 import getInput from "../../../utils/getInput";
 
 const problem = {
-  year: 2021,
-  day: null,
+  year: 2020,
+  day: 25,
 };
 
 const part1 = () => {
@@ -14,13 +14,13 @@ const part1 = () => {
 };
 
 function solvePart1(input: any): number {
-  let result;
+  let result = 0;
 
   return result;
 }
 
 function solvePart2(input: any): number {
-  let result2;
+  let result2 = 0;
 
   return result2;
 }

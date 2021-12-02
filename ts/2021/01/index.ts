@@ -1,12 +1,7 @@
 import getInput from "../../../utils/getInput";
 
-const problem = {
-  year: 2021,
-  day: null,
-};
-
 const part1 = () => {
-  const input = getInput(problem.year, problem.day)
+  const input = getInput(2021, 1)
     .split("\n")
     .map((e) => Number(e));
 
@@ -14,16 +9,29 @@ const part1 = () => {
 };
 
 function solvePart1(input: any): number {
-  let result;
-
-  return result;
+  let depthIncreases = 0;
+  for (let i = 1; i < input.length; i++) {
+    if (input[i] > input[i - 1]) {
+      depthIncreases++;
+    }
+  }
+  return depthIncreases;
 }
 
 function solvePart2(input: any): number {
-  let result2;
+  let depthIncreases = 0;
+  for (let i = 2; i < input.length; i++) {
+    const w0 = input[i - 3] - input[i - 1] - input[i - 2];
+    const w1 = input[i] - input[i - 1] - input[i - 2];
 
-  return result2;
+    if (w1 > w0) {
+      depthIncreases++;
+    }
+  }
+  return depthIncreases;
 }
+
+class SubmarineFloor {}
 
 const part2 = () => {
   const input = getInput(2021, 1)
@@ -37,16 +45,14 @@ const testPart1 = () => {
   const input = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
 
   const expected = 7;
-  const actual = solvePart1(input);
-  console.assert(actual === expected, `${actual} vs the expected: ${expected}`);
+  console.assert(solvePart1(input) === expected);
 };
 
 const testPart2 = () => {
   const input = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263];
 
   const expected = 5;
-  const actual = solvePart1(input);
-  console.assert(actual === expected, `${actual} vs the expected: ${expected}`);
+  console.assert(solvePart2(input) === expected);
 };
 
 testPart1();

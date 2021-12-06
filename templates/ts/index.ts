@@ -18,6 +18,7 @@ const parseInput = (input: string) => {
 };
 
 function solvePart1(input: any): number {
+  console.info(`Solving part 1. ${problem.year}/12/${problem.day}`);
   const len = input[0].length;
   console.log({ len, input });
   let res = 987;
@@ -40,14 +41,17 @@ const part2 = () => {
   return solvePart2(input);
 };
 
-const testPart1 = () => {
+const testPart1 = (): boolean => {
   const input = readTestInputFile(problem.year, problem.day);
-  console.assert(input != "" && input.length > 0, "Empty test input");
+  console.assert(input != "" && input.length > 0, "Empty test input part1 !");
+  if (input != "") return true; // Skip test and try problem
   const parsed = parseInput(input);
 
   const expected = 198;
   const actual = solvePart1(parsed);
-  console.assert(actual === expected, `T1: ${actual} vs the expected: ${expected}`);
+  const result = actual === expected;
+  console.assert(result, `T1: ${actual} vs the expected: ${expected}`);
+  return result;
 };
 
 const testPart2 = () => {
@@ -63,8 +67,9 @@ function main() {
   console.log(`----------------------------------------------------------`);
   console.log(`Running Advent of Code ${problem.year} Day: ${problem.day}`);
   if (!problem.part1Done) {
-    testPart1();
-    console.log(`Solution 1: ${part1()}`);
+    if (testPart1()) {
+      console.log(`Solution 1: ${part1()}`);
+    }
   } else if (!problem.part2Done) {
     testPart2();
     console.log(`Solution 2: ${part2()}`);

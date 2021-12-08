@@ -45,7 +45,7 @@ const part2 = () => {
 const testPart1 = (): boolean => {
   const input = readTestInputFile(problem.year, problem.day);
   console.assert(input != "" && input.length > 0, "Empty test input part1 !");
-  if (input != "") return true; // Skip test and try problem
+  if (input == "") return true; // Skip test and try problem
   console.info("Running test 1");
   const parsed = parseInput(input);
 

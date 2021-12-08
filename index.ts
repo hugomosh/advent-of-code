@@ -38,6 +38,13 @@ const createFromTemplate = async () => {
   console.log(readme);
 
   writeFileSync(`${path}/README.md`, readme);
+  writeFileSync(
+    `${path}/config.ts`,
+    `export const config = {
+      year:${year},
+      day:${day},
+  };`
+  );
 };
 
 if (action === "create") {

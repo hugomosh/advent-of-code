@@ -2,8 +2,8 @@ import getInput, { readTestInputFile } from "../../../utils/getInput";
 import { config } from "./config";
 
 const problem = {
-  year: config.year,
-  day: config.day,
+  year: 2021,
+  day: 4,
   part1Done: false,
   part2Done: false,
 };
@@ -52,7 +52,6 @@ const testPart1 = (): boolean => {
   const expected = 5934;
   const actual = solvePart1(parsed);
   const result = actual === expected;
-  result ?? console.info("1️⃣✅", actual);
   console.assert(result, `T1: ${actual} vs the expected: ${expected}`);
   return result;
 };
@@ -67,11 +66,11 @@ const testPart2 = () => {
 };
 
 function main() {
-  console.info(`------------------------------------------------------------`);
-  console.info(`🎄 Running Advent of Code ${problem.year} Day: ${problem.day}`);
+  console.info(`----------------------------------------------------------`);
+  console.info(`Running Advent of Code ${problem.year} Day: ${problem.day}`);
   if (!problem.part1Done) {
     if (testPart1()) {
-      console.info(`Solution 1️⃣: ${part1()}`);
+      console.info(`Solution 1: ${part1()}`);
     }
   } else if (!problem.part2Done) {
     testPart2();

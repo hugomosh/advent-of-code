@@ -4,6 +4,9 @@ import { config } from "./config";
 const problem = {
   year: config.year,
   day: config.day,
+  doTest: true,
+  expectedT1: 123,
+  expectedT2: 089,
   part1Done: false,
   part2Done: false,
 };
@@ -49,11 +52,12 @@ const testPart1 = (): boolean => {
   console.info("Running test 1");
   const parsed = parseInput(input);
 
-  const expected = 5934;
+  const expected = problem.expectedT1;
   const actual = solvePart1(parsed);
   const result = actual === expected;
-  result ?? console.info("1️⃣✅", actual);
-  console.assert(result, `T1: ${actual} vs the expected: ${expected}`);
+  result
+    ? console.info("1️⃣ ✅", actual)
+    : console.assert(result, `T1️⃣  ${actual} vs the expected: ${expected}`);
   return result;
 };
 
@@ -61,21 +65,26 @@ const testPart2 = () => {
   const input = readTestInputFile(problem.year, problem.day);
   const parsed = parseInput(input);
 
-  const expected = 230;
+  const expected = problem.expectedT2;
   const actual = solvePart2(parsed);
-  console.assert(actual === expected, `T1: ${actual} vs the expected: ${expected}`);
+  const result = actual === expected;
+  result
+    ? console.info("2️⃣ ✅", actual)
+    : console.assert(result, `T2️⃣: ${actual} vs the expected: ${expected}`);
+  return result;
 };
 
 function main() {
   console.info(`------------------------------------------------------------`);
   console.info(`🎄 Running Advent of Code ${problem.year} Day: ${problem.day}`);
   if (!problem.part1Done) {
-    if (testPart1()) {
+    if (!problem.doTest || testPart1()) {
       console.info(`Solution 1️⃣: ${part1()}`);
     }
   } else if (!problem.part2Done) {
-    testPart2();
-    console.info(`Solution 2: ${part2()}`);
+    if (!problem.doTest || testPart2()) {
+      console.info(`Solution 2️⃣: ${part2()}`);
+    }
   }
 }
 

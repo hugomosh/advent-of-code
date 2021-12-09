@@ -41,9 +41,9 @@ const createFromTemplate = async () => {
   writeFileSync(
     `${path}/config.ts`,
     `export const config = {
-      year:${year},
-      day:${day},
-  };`
+      year: ${year},
+      day: ${day},
+    };`
   );
 };
 

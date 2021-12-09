@@ -1,4 +1,4 @@
 export const config = {
-      year:2021,
-      day:9,
-  };
+  year: 2021,
+  day: 9,
+};

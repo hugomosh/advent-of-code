@@ -90,7 +90,6 @@ function solvePart2(input: any): number {
     }
   }
 
-  console.log(basin);
 
   let res2 = Array.from(basin.values())
     .sort((a, b) => b - a)
@@ -126,7 +125,10 @@ const testPart2 = () => {
 
   const expected = 1134;
   const actual = solvePart2(parsed);
-  console.assert(actual === expected, `T1: ${actual} vs the expected: ${expected}`);
+  const result = actual === expected;
+  result ?? console.info("2️⃣✅", actual);
+  console.assert(result, `T1: ${actual} vs the expected: ${expected}`);
+  return result;
 };
 
 function main() {
@@ -137,8 +139,9 @@ function main() {
       console.info(`Solution 1️⃣: ${part1()}`);
     }
   } else if (!problem.part2Done) {
-    testPart2();
-    // console.info(`Solution 2: ${part2()}`);
+    if (testPart2()) {
+      console.info(`Solution 2️⃣: ${part2()}`);
+    }
   }
 }
 

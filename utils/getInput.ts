@@ -12,10 +12,7 @@ export default function readInputFile(
 ): string {
   return readFileSync(filePath, "utf-8");
 }
-export function readTestInputFile(
-  year: string | number,
-  day: string | number
-): string {
+export function readTestInputFile(year: string | number, day: string | number): string {
   let filePath = getInputPath(year, day);
   filePath[2] = `.example.txt`;
   return readInputFile(year, day, filePath.join(""));

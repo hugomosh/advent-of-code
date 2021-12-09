@@ -11,14 +11,20 @@ const problem = {
   part2Done: false,
 };
 
+const parseInput = (input: string) => {
+  return input.split("\n");
+};
+
 const part1 = () => {
   const parse = getInput(problem.year, problem.day);
   const input = parseInput(parse);
   return solvePart1(input);
 };
 
-const parseInput = (input: string) => {
-  return input.split("\n");
+const part2 = () => {
+  const parse = getInput(problem.year, problem.day);
+  const input = parseInput(parse);
+  return solvePart2(input);
 };
 
 function solvePart1(input: any): number {
@@ -31,6 +37,7 @@ function solvePart1(input: any): number {
   return res;
 }
 
+/* ----------------------------   Part 2  ------------------------------*/
 function solvePart2(input: any): number {
   const len = input[0].length;
   console.info({ len, input });
@@ -38,12 +45,6 @@ function solvePart2(input: any): number {
 
   return res2;
 }
-
-const part2 = () => {
-  const parse = getInput(problem.year, problem.day);
-  const input = parseInput(parse);
-  return solvePart2(input);
-};
 
 const testPart1 = (): boolean => {
   const input = readTestInputFile(problem.year, problem.day);

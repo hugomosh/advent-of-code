@@ -12,13 +12,19 @@ const action = process.argv[2];
 const year = process.argv[3];
 const day = process.argv[4];
 
-const getTsPath = (year: Number | String, day: Number | String) => {
+const getTsPath = (year: number | string, day: number | string) => {
   day = String(day);
   return `./ts/${year}/${day.padStart(2, "0")}`;
 };
 
+const getSecondPart = async (year: string, day: string) => {
+  const path = getTsPath(year, day);
+  const readme = await getPuzzleDescription(year, day);
+  writeFileSync(`${path}/README.md`, readme);
+};
+
 const createFromTemplate = async () => {
-  let path = getTsPath(year, day),
+  const path = getTsPath(year, day),
     inputPath = getInputPath(year, day);
   if (!existsSync(path)) {
     console.log(`Creating challenge to ${path} from template...`);
@@ -30,7 +36,7 @@ const createFromTemplate = async () => {
   if (!existsSync(inputPath.join(""))) {
     console.log(`Downloading input into ${inputPath.join("")}...`);
     mkdirSync(inputPath[0], { recursive: true });
-    let input = await downloadInputForYearAndDay(day, year);
+    const input = await downloadInputForYearAndDay(day, year);
     writeFileSync(inputPath.join(""), input);
     writeFileSync(inputPath[0] + inputPath[1] + `.example.txt`, "");
   }
@@ -49,6 +55,10 @@ const createFromTemplate = async () => {
 
 if (action === "create") {
   createFromTemplate();
+}
+
+if (action === "s") {
+  getSecondPart(year, day);
 }
 
 if (action === "run") {

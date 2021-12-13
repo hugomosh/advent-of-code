@@ -53,6 +53,22 @@ const createFromTemplate = async () => {
   );
 };
 
+function run() {
+  const path = getTsPath(year, day) + `/index.ts`;
+  if (existsSync(path)) {
+    spawn("nodemon", ["-x", "ts-node", `${path} ${year} ${day}`], {
+      stdio: "inherit",
+      shell: true,
+    });
+  }
+}
+
+
+async function crun() {
+  await createFromTemplate();
+  run();
+}
+
 if (action === "create") {
   createFromTemplate();
 }
@@ -62,11 +78,9 @@ if (action === "s") {
 }
 
 if (action === "run") {
-  const path = getTsPath(year, day) + `/index.ts`;
-  if (existsSync(path)) {
-    spawn("nodemon", ["-x", "ts-node", `${path} ${year} ${day}`], {
-      stdio: "inherit",
-      shell: true,
-    });
-  }
+  run();
+}
+
+if (action === "crun") {
+  crun();
 }

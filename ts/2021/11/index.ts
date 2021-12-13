@@ -5,14 +5,15 @@ const problem = {
   year: config.year,
   day: config.day,
   doTest: true,
-  expectedT1: 123,
-  expectedT2: 789,
-  part1Done: false,
+  expectedT1: 1656,
+  expectedT2: 195,
+  part1Done: true,
   part2Done: false,
 };
 
 const parseInput = (input: string) => {
-  return input.split("\n");
+  return input
+    .split("\n").map(l => l.split("").map(Number));
 };
 
 const part1 = () => {
@@ -27,23 +28,98 @@ const part2 = () => {
   return solvePart2(input);
 };
 
+const coords = (i: number, j: number) => `${i},${j}`;
+function increaseNei(i: number, j: number, m: number[][]) {
+  const ne = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+  ];
+
+  for (let n of ne) {
+    const ii = n[0] + i, jj = n[1] + j;
+    if (ii >= 0 && ii < m.length && jj >= 0 && jj < m[0].length) {
+      if (m[ii][jj] == 10) continue;
+      m[ii][jj]++;
+      if (m[ii][jj] == 10) {
+        increaseNei(ii, jj, m);
+      }
+    }
+  }
+}
+
 function solvePart1(input: any): number {
   console.info(`Solving part 1. ${problem.year}/12/${problem.day}`);
-  const len = input[0].length;
-  console.info({ len, input });
-  let res = 987;
-  //parseInt(gamma.join(""), 2)
+  const m = input;
+  let res = 0;
 
+  for (let k = 0; k < 100; k++) {
+    let que = new Map();
+    for (let i = 0; i < m.length; i++) {
+      for (let j = 0; j < m[0].length; j++) {
+        if (m[i][j] != 10) {
+          m[i][j]++;
+          if (m[i][j] == 10) {
+            //console.log(i, j);
+            increaseNei(i, j, m);
+
+          }
+        }
+      }
+    }
+
+    for (let i = 0; i < m.length; i++) {
+      for (let j = 0; j < m[0].length; j++) {
+        if (m[i][j] == 10) {
+          m[i][j] = 0;
+          res++;
+        }
+      }
+    }
+
+  }
+
+  //  console.log(m, res);
   return res;
 }
 
 /* ----------------------------   Part 2  ------------------------------*/
 function solvePart2(input: any): number {
-  const len = input[0].length;
-  console.info({ len, input });
-  let res2 = 123;
+  const m = input;
 
-  return res2;
+  for (let k = 0; k < 500; k++) {
+    for (let i = 0; i < m.length; i++) {
+      for (let j = 0; j < m[0].length; j++) {
+        if (m[i][j] != 10) {
+          m[i][j]++;
+          if (m[i][j] == 10) {
+            increaseNei(i, j, m);
+          }
+        }
+      }
+    }
+    let res = 0;
+    for (let i = 0; i < m.length; i++) {
+      for (let j = 0; j < m[0].length; j++) {
+        if (m[i][j] == 10) {
+          m[i][j] = 0;
+          res++;
+        }
+      }
+    }
+    const v = m.map((l: number[][]) => l.join("")).join("\n");
+    if (res == (m.length * m[0].length)) {
+      return k + 1;
+    }
+  }
+
+  console.log(m);
+  return 0;
 }
 
 const testPart1 = (): boolean => {

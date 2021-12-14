@@ -1,4 +1,4 @@
-import getInput, { readTestInputFile } from "../../../utils/getInput";
+import getInput, { getInputPath, readTestInputFile } from "../../../utils/getInput";
 import { config } from "./config";
 
 const problem = {
@@ -90,7 +90,9 @@ const part1 = () => {
 };
 
 const part2 = () => {
-  const parse = getInput(problem.year, problem.day);
+  const filePath = getInputPath(problem.year, problem.day)
+  filePath[2] = `.example.1.txt`;
+  const parse = getInput(problem.year, problem.day, filePath.join(""));
   const input = parseInput(parse);
   return solvePart2(input);
 };
@@ -114,14 +116,14 @@ function solvePart2(input: any): number {
   const [points, inst] = input;
   console.info(`Solving part 2. ${problem.year}/12/${problem.day}`);
   const len = points[0].length;
-  console.info({ len, points });
+  //console.info({ len, points });
   const p = new Paper1(points);
   for (let i = 0; i < inst.length; i++) {
     const element = inst[i];
     console.log(element);
     p.fold(element[0], element[1]);
   }
-  console.log(p.mapa);
+  //console.log(p.mapa);
   console.log(p.print());
 
   let res = p.getPoint();

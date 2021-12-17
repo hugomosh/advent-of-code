@@ -237,7 +237,7 @@ function solvePart2(inputO: any): number {
           closedList.set(coords(newCoords[0], newCoords[1]), newNode);
           openList.add(newNode.coords);
         }
-      }
+      } Array.from({l},)
     }
     // Score of n
     // update better score

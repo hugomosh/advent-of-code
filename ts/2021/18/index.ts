@@ -22,7 +22,7 @@ class SnailFish {
   value: D;
   constructor(original: string) {
     this.original = original;
-    this.value = eval(original);
+    this.value = JSON.parse(original);
   }
 
   getMagnitud(): number {

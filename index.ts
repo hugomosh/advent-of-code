@@ -36,13 +36,22 @@ const createFromTemplate = async () => {
   if (!existsSync(inputPath.join(""))) {
     console.log(`Downloading input into ${inputPath.join("")}...`);
     mkdirSync(inputPath[0], { recursive: true });
-    const input = await downloadInputForYearAndDay(day, year);
+    let input;
+    try {
+      input = await downloadInputForYearAndDay(day, year);
+    } catch (error) {
+      console.warn("No connection for input");
+      input = "Failed to connect. Manual Input!";
+    }
     writeFileSync(inputPath.join(""), input);
     writeFileSync(inputPath[0] + inputPath[1] + `.example.txt`, "");
   }
-  let readme = await getPuzzleDescription(year, day);
-  console.log(readme);
-
+  let readme = "";
+  try {
+    readme = await getPuzzleDescription(year, day);
+  } catch (error) {
+    console.warn("No connection for readme");
+  }
   writeFileSync(`${path}/README.md`, readme);
   writeFileSync(
     `${path}/config.ts`,

@@ -4,7 +4,7 @@ import { config } from "./config";
 const problem = {
   year: config.year,
   day: config.day,
-  doTest: true,
+  doTest: 0,
   expectedT1: 590784,
   expectedT2: 2758514936282235,
   part1Done: 1,
@@ -49,7 +49,7 @@ class Volume {
     }
     for (let i = 0; i < rangesVector.length; i = i + 2) {
       this.ranges.push([rangesVector[i], rangesVector[i + 1]]);
-      v = v * Math.abs(rangesVector[i + 1] - rangesVector[i]);
+      v = v * Math.abs(rangesVector[i + 1] + 1 - rangesVector[i]);
     }
     this.volume = v;
   }
@@ -80,7 +80,6 @@ function getIntersection(a: Volume, b: Volume): null | number[] {
 // This is r1<=r2 && l2<=l1 for each coordinate.
 function getVolumesWithoutIntersection(v: Volume, intersection: Volume | number[]): Volume[] {
   if (!(intersection instanceof Volume)) intersection = new Volume(...intersection);
-
   const volumes: Volume[] = [],
     // The
     segments: number[][][] = [];
@@ -89,14 +88,26 @@ function getVolumesWithoutIntersection(v: Volume, intersection: Volume | number[
     const [r2, l2] = intersection.ranges[i];
     segments.push(
       [
-        [r1, r2],
+        [r1, r2 - 1],
         [r2, l2],
-        [l2, l1],
-      ].filter((r) => r[0] != r[1])
+        [l2 + 1, l1],
+      ].filter((r) => r[0] <= r[1])
     );
   }
-  console.log(segments);
-
+  const intersectionStr = intersection.ranges.join(",");
+  for (let i = 0; i < segments[0].length; i++) {
+    const xr = segments[0][i];
+    for (let j = 0; j < segments[1].length; j++) {
+      const yr = segments[1][j];
+      for (let k = 0; k < segments[2].length; k++) {
+        const zr = segments[2][k];
+        const newRange = [...xr, ...yr, ...zr];
+        if (newRange.join(",") !== intersectionStr) {
+          volumes.push(new Volume(...newRange));
+        }
+      }
+    }
+  }
   return volumes;
 }
 
@@ -123,14 +134,23 @@ const tests = () => {
   function testVolumesWithoutIntersection() {
     const v12 = getVolumesWithoutIntersection(cube1, i12!);
     const v34 = getVolumesWithoutIntersection(cube3, i34!);
+    const v = new Volume(10, 12, 10, 12, 10, 12);
+    const t = getVolumesWithoutIntersection(v, [11, 12, 11, 12, 11, 12]);
 
-    console.log({ v12, v34 });
+    console.dir({ t }, { depth: null });
+    const tVol = t.reduce((a, t) => t.volume + a, 0);
+    console.log(`Vol ${tVol} vs ${v.volume}`);
+    console.assert(tVol < v.volume);
   }
+
+  console.assert(1 == new Volume(10, 10, 10, 10, 10, 10).volume, "Volume 1");
+  console.assert(2 == new Volume(10, 11, 10, 10, 10, 10).volume, "Volume 2");
+
   testIntersection();
   testVolumesWithoutIntersection();
 };
 
-tests();
+//tests();
 
 function range(size: number, startAt: number = 0): ReadonlyArray<number> {
   return [...Array(size).keys()].map((i) => i + startAt);
@@ -144,23 +164,32 @@ function solvePart1(input: any): number {
   // const onVolume, offVolume;
   //Add area to onVolume and remove overlapping volume from offVolume;
   //Add area to offVolume;
-
-  // Try to add a cube, if no intersections with existing, if there is one. Split the cube in eight. Try to insert each one.
-
-  // Should only try to add the other 7 cubes
-  const coordsOn = new Set(),
-    coordsOff = new Set();
+  let coordsOn: Volume[] = [];
   for (let i = 0; i < input.length; i++) {
+    console.log(input);
+
     const [o, x, xx, y, yy, z, zz] = input[i];
-    const turnOn = o == "on";
+    if (Math.abs(x) > 50) break;
+    const c = new Volume(x, xx, y, yy, z, zz);
+    console.dir(c, { depth: null });
+    // Get intersections with current cubes,
+    const newCoordsOn = [];
+    for (const v of coordsOn) {
+      const inter = getIntersection(v, c);
+      if (!inter) {
+        newCoordsOn.push(v);
+      } else {
+        newCoordsOn.push(...getVolumesWithoutIntersection(v, inter));
+      }
+    }
+    if (o == "on") {
+      newCoordsOn.push(c);
+    }
+    console.info(newCoordsOn.reduce((a, v: Volume) => v.volume + a, 0));
+    coordsOn = newCoordsOn;
+    console.log("----");
   }
-  return coordsOn.size;
-
-  let res = 987;
-
-  //parseInt(gamma.join(""), 2)
-
-  return res;
+  return coordsOn.reduce((a, v: Volume) => v.volume + a, 0);
 }
 
 /* ----------------------------   Part 2  ------------------------------*/
@@ -170,26 +199,31 @@ function solvePart2(input: any): number {
   // const onVolume, offVolume;
   //Add area to onVolume and remove overlapping volume from offVolume;
   //Add area to offVolume;
-  const coordsOn = new Set(),
-    coordsOff = new Set();
+  let coordsOn: Volume[] = [];
   for (let i = 0; i < input.length; i++) {
+    console.log(input);
+
     const [o, x, xx, y, yy, z, zz] = input[i];
-
     const c = new Volume(x, xx, y, yy, z, zz);
-
+    console.dir(c, { depth: null });
     // Get intersections with current cubes,
-
-    if (o == "on") {
-    } else {
+    const newCoordsOn = [];
+    for (const v of coordsOn) {
+      const inter = getIntersection(v, c);
+      if (!inter) {
+        newCoordsOn.push(v);
+      } else {
+        newCoordsOn.push(...getVolumesWithoutIntersection(v, inter));
+      }
     }
+    if (o == "on") {
+      newCoordsOn.push(c);
+    }
+    console.info(newCoordsOn.reduce((a, v: Volume) => v.volume + a, 0));
+    coordsOn = newCoordsOn;
+    console.log("----");
   }
-  return coordsOn.size;
-
-  let res = 987;
-
-  //parseInt(gamma.join(""), 2)
-
-  return res;
+  return coordsOn.reduce((a, v: Volume) => v.volume + a, 0);
 }
 
 const testPart1 = (): boolean => {

@@ -26,7 +26,7 @@ export const downloadInputForYearAndDay = (day: string, year: string) => {
   });
 };
 
-export const getPuzzleDescription = (year: string, day: string) => {
+export const getPuzzleDescription = (year: string, day: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const options = {
       hostname: "adventofcode.com",

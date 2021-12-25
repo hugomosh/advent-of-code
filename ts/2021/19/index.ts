@@ -1,4 +1,6 @@
+import { type } from "os";
 import getInput, { readTestInputFile } from "../../../utils/getInput";
+import { coordsToString } from "../../../utils/matrix";
 import { config } from "./config";
 
 const problem = {
@@ -134,79 +136,59 @@ function solvePart1(input: any): number {
         // Handshakes 6 -> 15
         // Handshakes n -> n*(n-1)/2
         intersections.push({ inter, s1, s2: scanner });
-        console.log({ inter: inter.size, name, s1: s1.name });
+        //console.log({ inter: inter.size, name, s1: s1.name });
       }
     }
     scanners.push(scanner);
   }
   intersections.sort((x, y) => x.s1.name.localeCompare(y.s1.name));
-
   const visited = new Set(), beacons = new Set();
   while (intersections.length > 0) {
     const { s1, s2, inter } = intersections.shift()!;
     // It has 12 points in common
     if (inter.size >= 66) {
-      let s0: Scanner, sR: Scanner;
+      let s0: Scanner, sN: Scanner;
       // Obtain Scanner position relative to s0 
       if (s1.isFlippedToMatchS0) {
-        s0 = s1; sR = s2;
+        s0 = s1; sN = s2;
       } else if (s2.isFlippedToMatchS0) {
-        s0 = s2; sR = s1;
+        s0 = s2; sN = s1;
       } else {
         // If no information progagated with s0 send to que
         console.log("No S0")!;
         intersections.push({ s1, s2, inter });
         continue;
       }
+      console.log({ s0: s0.name, sN: sN.name });
 
       const values = [...inter.values()];
-      const m0 = values[0];
+      const commonPointsS0 = new Map();
+      let i = 0;
 
-      const indeces0 = s0.magnitudesMap.get(m0);
-      const indicesR = sR.magnitudesMap.get(m0);
-
-      // Get the 2 points foreach set that cause a matching magnitud.
-      const [s0point1, s0point2] = [s0.detections[indeces0[0]], s0.detections[indeces0[1]]].sort((a, b) => a[0] - b[0]);
-      let [sRpoint1, sRpoint2] = [sR.detections[indicesR[0]], sR.detections[indicesR[1]]].sort((a, b) => a[0] - b[0]);
-      let d1 = diff(s0point1, s0point2),
-        d2 = diff(sRpoint1, sRpoint2);
-      console.log({ sRpoint1, sRpoint2, d1, d2 });
-
-      const transform = [d2.indexOf(d1[0]), d2.indexOf(d1[1]), d2.indexOf(d1[2])];
-      const pos = (transform.map((x, i) => x != -1 ? x : (d2.indexOf(-1 * d1[i]))) as triplet);
-      const sign = transform.map((x, i) => Math.sign(transform[pos.indexOf(i)] + 0.5));
-      console.log({ pos, sign, transform });
-      sR.orientateRelativeToS0(pos, sign as triplet);
-      // Align the beacon to match the s0 orientation
-
-      // Align the coordinates system (a,b,c) -> (x,y,z)
-      // Algin the directions (-a,b,c) -> (x,y,z)
-
-      //Verify 
-      [sRpoint1, sRpoint2] = [sR.detections[indicesR[0]], sR.detections[indicesR[1]]].sort((a, b) => a[0] - b[0]);
-      let delta0 = diff(s0point1, sRpoint1);
-      console.log({ sRpoint1, sRpoint2, delta0, delta1: diff(s0point1, sRpoint2) });
-
-      if (!isNaN(delta0[0]) && !equal(diff(s0point1, sRpoint1), diff(s0point2, sRpoint2))) {
-        delta0 = diff(s0point1, sRpoint2);
+      // This will get the 12 point and their coresponding number
+      while (commonPointsS0.size < 12 || [...commonPointsS0.values()].filter(x => x.match).length < 12) {
+        const magnitud = values[i];
+        const indeces0 = s0.magnitudesMap.get(magnitud);
+        const indicesN = sN.magnitudesMap.get(magnitud);
+        // Get the 2 points foreach set that cause a matching magnitud.
+        const [s0point1, s0point2] = [s0.detections[indeces0[0]], s0.detections[indeces0[1]]];
+        let [sNpoint1, sNpoint2] = [sN.detections[indicesN[0]], sN.detections[indicesN[1]]];
+        /*        console.log({
+                 s0point1, s0point2, sNpoint1, sNpoint2
+               }) */
+        // Add poinst to list with options or with the match if it is available 
+        commonPointsS0.set(coordsToString(s0point1),
+          getOptionsOrMatch(s0point1, [sNpoint1, sNpoint2], commonPointsS0)
+        );
+        commonPointsS0.set(coordsToString(s0point2),
+          getOptionsOrMatch(s0point2, [sNpoint1, sNpoint2], commonPointsS0)
+        );
+        i++;
       }
+      console.log(new Array(30).fill("-").join(""));
 
-      sR.updateWithD0(delta0 as triplet);
-
-      console.log("------------------");
-
-      // Because there are no repetead magnitud it should help identify the orientation
-      if (!visited.has(s0.name)) {
-        s0.detections0.sort((a, b) => a[0] - b[0]).forEach(d => beacons.add(d.join(",")));
-        visited.add(s0.name);
-      }
-      if (!visited.has(s1.name)) {
-        sR.detections0.sort((a, b) => a[0] - b[0]).forEach(d => beacons.add(d.join(",")));
-        visited.add(s1.name);
-      }
-
-
-      // Register all Beacons   console.log(...beacons.values());
+      console.log(commonPointsS0);
+      sN.isFlippedToMatchS0 = true;
     }
 
 
@@ -272,3 +254,22 @@ function main() {
 }
 
 main();
+
+type PointMatchFinder = { options?: Set<string>, match?: string };
+
+function getOptionsOrMatch(
+  point: triplet, possiblePoints: [triplet, triplet], commonPoints: Map<any, PointMatchFinder>): PointMatchFinder {
+  if (commonPoints.has(coordsToString(point))) {
+    const { options, match } = commonPoints.get(coordsToString(point))!;
+    if (match) return { match };
+    if (!options) throw new Error(`N options for ${coordsToString(point)}`);
+    const newMatch =
+      options.has(coordsToString(possiblePoints[0]!))
+        ? coordsToString(possiblePoints[0]!) :
+        options.has(coordsToString(possiblePoints[1]!)) ? coordsToString(possiblePoints[1]!) : undefined;
+    console.assert(newMatch, `No match for ${coordsToString(point)}`);
+    return { match: newMatch };
+  } else {
+    return { options: new Set(possiblePoints.map(coordsToString)) }
+  }
+}

@@ -1,15 +1,15 @@
 import { type } from "os";
 import getInput, { readTestInputFile } from "../../../utils/getInput";
-import { coordsToString } from "../../../utils/matrix";
+import { coordsToString, stringToCoords } from "../../../utils/matrix";
 import { config } from "./config";
 
 const problem = {
   year: config.year,
   day: config.day,
-  doTest: 0,
+  doTest: 1,
   expectedT1: 79,
-  expectedT2: 789,
-  part1Done: false,
+  expectedT2: 3621,
+  part1Done: 1,
   part2Done: false,
 };
 
@@ -37,6 +37,23 @@ function getMagnitud(t1: triplet, t2: triplet) {
 }
 
 class Scanner {
+  adjust(rotation: any[], signs: any[], diffs: any[]) {
+    const relativePos = [0, 0, 0];
+    for (const i of [0, 1, 2]) {
+      relativePos[rotation[i]] = diffs[i] * signs[i];
+    }
+
+    for (const t of this.detections) {
+      const tt = [0, 0, 0];
+      for (const i of [0, 1, 2]) {
+        tt[rotation[i]] = relativePos[rotation[i]] - t[i] * signs[i];
+      }
+      this.detections0.push(tt as triplet);
+    }
+    this.relativePos = relativePos as triplet;
+    //console.log(this.detections);
+    console.log(relativePos);
+  }
   name: string;
   detections: triplet[];
   detections0: triplet[] = [];
@@ -50,6 +67,7 @@ class Scanner {
     if (name === "--- scanner 0 ---") {
       this.isFlippedToMatchS0 = true;
       this.relativePos = [0, 0, 0];
+      this.detections0 = detections;
     }
     this.detections = detections;
     //this.beacons = detections.map(d => new Beacon(this, d));
@@ -64,7 +82,8 @@ class Scanner {
         const m = getMagnitud(ei, ej);
         this.magnitudes.add(m);
         if (this.magnitudesMap.has(m)) {
-          console.log("Repeated magnitude");
+          console.log("Repeated magnitude", m, ei, ej);
+          //  this.magnitudesMap.set(m, [...this.magnitudesMap.get(m), [i, j]]);
         }
         this.magnitudesMap.set(m, [i, j]);
       }
@@ -87,7 +106,7 @@ class Scanner {
 }
 
 const parseInput = (input: string) => {
-  return input.split("\n\n").map((scanner) => scanner.split("\n"));
+  return input.split("\n\n").map((scanner) => scanner.split("\n").filter((x) => x != ""));
 };
 
 const part1 = () => {
@@ -154,16 +173,18 @@ function solvePart1(input: any): number {
   }
   console.log(allMagnitudes.size); */
 
-  intersections.sort((x, y) => x.s1.name.localeCompare(y.s1.name));
+  //intersections.sort((x, y) => y.inter.size - x.inter.size);
   const visited = new Set(),
     beacons = new Set();
   while (intersections.length > 0) {
     const { s1, s2, inter } = intersections.shift()!;
-    console.log({ i: inter.size, c1: s1.detections.length, c2: s2.detections.length });
+
     // It has 12 points in common
     if (inter.size < 66) {
       continue;
     }
+    console.log({ i: inter.size, s1: s1.name, s2: s2.name });
+
     let s0: Scanner, sN: Scanner;
     // Obtain Scanner position relative to s0
     if (s1.isFlippedToMatchS0) {
@@ -178,6 +199,9 @@ function solvePart1(input: any): number {
       intersections.push({ s1, s2, inter });
       continue;
     }
+    if (sN.isFlippedToMatchS0) {
+      continue;
+    }
     console.log({ s0: s0.name, sN: sN.name });
 
     const values = [...inter.values()];
@@ -186,54 +210,211 @@ function solvePart1(input: any): number {
 
     // This will get the 12 point and their corresponding number
     while (
-      commonPointsS0.size < personsForHandshakes[inter.size] ||
-      [...commonPointsS0.values()].filter((x) => x.match).length < personsForHandshakes[inter.size]
+      commonPointsS0.size < 12 ||
+      [...commonPointsS0.values()].filter((x) => x.match != undefined).length < 12
     ) {
       const magnitud = values[i];
+      if (!magnitud) {
+        //Intersect in two points
+        console.log(commonPointsS0);
+      }
       const indeces0 = s0.magnitudesMap.get(magnitud);
       const indicesN = sN.magnitudesMap.get(magnitud);
       // Get the 2 points foreach set that cause a matching magnitude.
-      const [s0point1, s0point2] = [s0.detections[indeces0[0]], s0.detections[indeces0[1]]];
+      const [s0point1, s0point2] = [s0.detections0[indeces0[0]], s0.detections0[indeces0[1]]];
       let [sNpoint1, sNpoint2] = [sN.detections[indicesN[0]], sN.detections[indicesN[1]]];
       /*        console.log({
                  s0point1, s0point2, sNpoint1, sNpoint2
                }) */
       // Add poinst to list with options or with the match if it is available
-      commonPointsS0.set(
-        coordsToString(s0point1),
-        getOptionsOrMatch(s0point1, [sNpoint1, sNpoint2], commonPointsS0)
-      );
-      commonPointsS0.set(
-        coordsToString(s0point2),
-        getOptionsOrMatch(s0point2, [sNpoint1, sNpoint2], commonPointsS0)
-      );
+      try {
+        commonPointsS0.set(
+          coordsToString(s0point1),
+          getOptionsOrMatch(s0point1, [sNpoint1, sNpoint2], commonPointsS0)
+        );
+        commonPointsS0.set(
+          coordsToString(s0point2),
+          getOptionsOrMatch(s0point2, [sNpoint1, sNpoint2], commonPointsS0)
+        );
+      } catch (error) {
+        console.log({ commonPointsS0, s0point1, s0point2 });
+
+        commonPointsS0.delete(coordsToString(s0point1));
+        commonPointsS0.delete(coordsToString(s0point2));
+      }
       i++;
     }
+    try {
+      const { rotation, signs, diffs } = getOrientationAndDiff(commonPointsS0);
+      sN.adjust(rotation, signs, diffs);
+
+      //Add beacons s1
+      s0.detections0.map(coordsToString).forEach((x) => beacons.add(x));
+      sN.detections0.map(coordsToString).forEach((x) => beacons.add(x));
+    } catch (error) {
+      console.log({ commonPointsS0 });
+    }
+
     console.log(new Array(30).fill("-").join(""));
-    for (const [k, v] of commonPointsS0.entries()) {
+    /* Way to count intersections
+        for (const [k, v] of commonPointsS0.entries()) {
       points.set(k, (points.get(k) ?? 0) + 1);
       points.set(v.match, (points.get(v.match) ?? 0) + 1);
-    }
-    sN.isFlippedToMatchS0 = true;
-  }
-  let res = 0;
-
-  for (const v of points.values()) {
+        for (const v of points.values()) {
     res += 1 / v;
   }
+    } */
+    sN.isFlippedToMatchS0 = true;
+  }
+  let res = beacons.size;
 
-  return Math.ceil(res);
+  return res;
 }
 
 /* ----------------------------   Part 2  ------------------------------*/
 function solvePart2(input: any): number {
-  const len = input[0].length;
-  console.info({ len, input });
-  let res2 = 123;
+  console.info(`Solving part 2. ${problem.year}/12/${problem.day}`);
+  const scanners: Scanner[] = [];
+  const points: Map<string, number> = new Map();
+  const intersections: { inter: Set<number>; s1: Scanner; s2: Scanner }[] = [];
+  for (const s of input) {
+    const name = s[0];
+    const detections: triplet[] = [];
+    for (let i = 1; i < s.length; i++) {
+      const element: triplet = s[i].split(",").map(Number);
+      points.set(s[i], 1);
+      detections.push(element);
+    }
+    const scanner = new Scanner(name, detections);
+    for (let i = 0; i < scanners.length; i++) {
+      const s1 = scanners[i];
+      const inter = intersection(scanner.magnitudes, s1.magnitudes);
+      if (inter.size >= 0) {
+        // Handshakes 12 -> 66
+        // Handshakes 6 -> 15
+        // Handshakes n -> n*(n-1)/2
+        intersections.push({ inter, s1, s2: scanner });
+        //console.log({ inter: inter.size, name, s1: s1.name });
+      }
+    }
+    scanners.push(scanner);
+  }
+  const visited = new Set(),
+    beacons = new Set();
+  while (intersections.length > 0) {
+    const { s1, s2, inter } = intersections.shift()!;
 
-  return res2;
+    // It has 12 points in common
+    if (inter.size < 66) {
+      continue;
+    }
+    console.log({ i: inter.size, s1: s1.name, s2: s2.name });
+
+    let s0: Scanner, sN: Scanner;
+    // Obtain Scanner position relative to s0
+    if (s1.isFlippedToMatchS0) {
+      s0 = s1;
+      sN = s2;
+    } else if (s2.isFlippedToMatchS0) {
+      s0 = s2;
+      sN = s1;
+    } else {
+      // If no information propagated with s0 send to que
+      console.log("No S0")!;
+      intersections.push({ s1, s2, inter });
+      continue;
+    }
+    if (sN.isFlippedToMatchS0) {
+      continue;
+    }
+    console.log({ s0: s0.name, sN: sN.name });
+
+    const values = [...inter.values()];
+    const commonPointsS0 = new Map();
+    let i = 0;
+
+    // This will get the 12 point and their corresponding number
+    while (
+      commonPointsS0.size < 12 ||
+      [...commonPointsS0.values()].filter((x) => x.match != undefined).length < 12
+    ) {
+      const magnitud = values[i];
+      if (!magnitud) {
+        //Intersect in two points
+        console.log(commonPointsS0);
+      }
+      const indeces0 = s0.magnitudesMap.get(magnitud);
+      const indicesN = sN.magnitudesMap.get(magnitud);
+      // Get the 2 points foreach set that cause a matching magnitude.
+      const [s0point1, s0point2] = [s0.detections0[indeces0[0]], s0.detections0[indeces0[1]]];
+      let [sNpoint1, sNpoint2] = [sN.detections[indicesN[0]], sN.detections[indicesN[1]]];
+      /*        console.log({
+                 s0point1, s0point2, sNpoint1, sNpoint2
+               }) */
+      // Add poinst to list with options or with the match if it is available
+      try {
+        commonPointsS0.set(
+          coordsToString(s0point1),
+          getOptionsOrMatch(s0point1, [sNpoint1, sNpoint2], commonPointsS0)
+        );
+        commonPointsS0.set(
+          coordsToString(s0point2),
+          getOptionsOrMatch(s0point2, [sNpoint1, sNpoint2], commonPointsS0)
+        );
+      } catch (error) {
+        console.log({ commonPointsS0, s0point1, s0point2 });
+
+        commonPointsS0.delete(coordsToString(s0point1));
+        commonPointsS0.delete(coordsToString(s0point2));
+      }
+      i++;
+    }
+    try {
+      const { rotation, signs, diffs } = getOrientationAndDiff(commonPointsS0);
+      sN.adjust(rotation, signs, diffs);
+
+      //Add beacons s1
+      s0.detections0.map(coordsToString).forEach((x) => beacons.add(x));
+      sN.detections0.map(coordsToString).forEach((x) => beacons.add(x));
+    } catch (error) {
+      console.log({ commonPointsS0 });
+    }
+
+    console.log(new Array(30).fill("-").join(""));
+    /* Way to count intersections
+        for (const [k, v] of commonPointsS0.entries()) {
+      points.set(k, (points.get(k) ?? 0) + 1);
+      points.set(v.match, (points.get(v.match) ?? 0) + 1);
+        for (const v of points.values()) {
+    res += 1 / v;
+  }
+    } */
+    sN.isFlippedToMatchS0 = true;
+  }
+  let distances = [];
+  for (let i = 0; i < scanners.length; i++) {
+    for (let j = i + 1; j < scanners.length; j++) {
+      distances.push(
+        getManhattanDistnace(
+          scanners[i].relativePos as number[],
+          scanners[j].relativePos as number[]
+        )
+      );
+    }
+  }
+
+  let res = Math.max(...distances);
+
+  return res;
 }
 
+function getManhattanDistnace(a: number[], b: number[]): number {
+  let res = 0;
+  for (let i = 0; i < a.length; i++) {
+    res += Math.abs(a[i] - b[i]);
+  }
+  return res;
+}
 const testPart1 = (): boolean => {
   const input = readTestInputFile(problem.year, problem.day);
   console.assert(input != "" && input.length > 0, "Empty test input part1 !");
@@ -289,7 +470,7 @@ function getOptionsOrMatch(
   if (commonPoints.has(coordsToString(point))) {
     const { options, match } = commonPoints.get(coordsToString(point))!;
     if (match) return { match };
-    if (!options) throw new Error(`N options for ${coordsToString(point)}`);
+    if (!options) throw new Error(`No options for ${coordsToString(point)}`);
     const newMatch = options.has(coordsToString(possiblePoints[0]!))
       ? coordsToString(possiblePoints[0]!)
       : options.has(coordsToString(possiblePoints[1]!))
@@ -300,4 +481,36 @@ function getOptionsOrMatch(
   } else {
     return { options: new Set(possiblePoints.map(coordsToString)) };
   }
+}
+function getOrientationAndDiff(commonPointsS0: Map<any, any>) {
+  const rotation = [];
+  const signs = [];
+  const diffs = [];
+  let valid = false;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      for (const s of [1, -1]) {
+        const diff = new Set();
+        for (const [kk, v] of commonPointsS0.entries()) {
+          if (!v.match) continue;
+          const p = stringToCoords(v.match);
+          const k = stringToCoords(kk);
+          diff.add(p[i] + k[j] * s);
+        }
+        if (diff.size === 1) {
+          valid = true;
+          rotation.push(j);
+          signs.push(s);
+          diffs.push([...diff.values()][0]);
+
+          //  console.log(i, j, s, diff);
+        }
+      }
+    }
+  }
+  if (!valid) {
+    console.log({ commonPointsS0 });
+    console.log({ rotation, signs, diffs });
+  }
+  return { rotation, signs, diffs };
 }

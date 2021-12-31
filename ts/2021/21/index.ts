@@ -58,7 +58,56 @@ function solvePart1(input: any): number {
 function solvePart2(input: any): number {
   const len = input.length;
   console.info({ len, input });
-  let res2 = 123;
+
+  let winsP1 = 0,
+    winsP2 = 0;
+  // const p1Games = numberOfTurnsToWinBothPlayers(input[0], input[1], 0, 0);
+
+  const que: number[][] = [];
+  const res = [];
+  // pos, score, turn, count
+  que.push([input[0], input[1], 0, 0, 1, 1]);
+  while (que.length > 0) {
+    const [p1, p2, s1, s2, t, v] = que.pop() as number[];
+    const nextTurn = t + 1;
+    let p, s;
+    if (t % 2 === 1) {
+      //Player 1
+      p = p1;
+      s = s1;
+    } else {
+      // Player 2
+      p = p2;
+      s = s2;
+    }
+
+    for (const [k, f] of frequencies.entries()) {
+      let newP = p + k;
+      newP = newP % 10;
+      newP = newP == 0 ? 10 : newP;
+      const newScore = s + newP;
+
+      if (t % 2 === 1) {
+        // Player 1
+        if (newScore >= 21) {
+          winsP1 += v * f;
+          //console.log(newP, newScore, nextTurn, v * f);
+        } else {
+          que.push([newP, p2, newScore, s2, nextTurn, v * f]);
+        }
+      } else {
+        // Player 2
+        if (newScore >= 21) {
+          winsP2 += v * f;
+          //console.log(newP, newScore, nextTurn, v * f);
+        } else {
+          que.push([p1, newP, s1, newScore, nextTurn, v * f]);
+        }
+      }
+    }
+  }
+
+  let res2 = Math.max(winsP1, winsP2);
 
   return res2;
 }
@@ -105,7 +154,94 @@ function main() {
     }
   }
 }
+/* const positions = new Map();
 
+const getNewPosition(pos:number,amount:number){
+  positions.get(pos)
+}
+
+ */
+// Turns it will take to reach a goal score of 21. Key is the number of games. Value is the number of universes.
+
+function numberOfTurnsToWinBothPlayers(
+  position1: number,
+  position2: number,
+  score1: number,
+  score2: number
+): number[][] {
+  // const turns = new Map();
+
+  const que: number[][] = [];
+  const res = [];
+  // pos, score, turn, count
+  que.push([position1, position2, score1, score2, 1, 1]);
+  while (que.length > 0) {
+    const [p1, p2, s1, s2, t, v] = que.pop() as number[];
+    const nextTurn = t + 1;
+    let p, s;
+    if (t % 2 === 1) {
+      //Player 1
+      p = p1;
+      s = s1;
+    } else {
+      // Player 2
+      p = p2;
+      s = s2;
+    }
+
+    for (const [k, f] of frequencies.entries()) {
+      let newP = p + k;
+      newP = newP % 10;
+      newP = newP == 0 ? 10 : newP;
+      const newScore = s + newP;
+
+      if (t % 2 === 1) {
+        if (newScore >= 21) {
+          //console.log(newP, newScore, nextTurn, v * f);
+          res.push([newP, newScore, nextTurn, v * f]);
+        } else {
+          que.push([newP, newScore, nextTurn, v * f]);
+        }
+      } else {
+        // Player 2
+        p = p2;
+        s = s2;
+      }
+    }
+  }
+
+  return res;
+}
+
+// Turns it will take to reach a goal score of 21. Key is the number of games. Value is the number of universes.
+function numberOfTurnsToWin(pos: number, score: number): number[][] {
+  // const turns = new Map();
+
+  const que: number[][] = [];
+  const res = [];
+  // pos, score, turn, count
+  que.push([pos, score, 0, 1]);
+  while (que.length > 0) {
+    const [p, s, t, v] = que.pop() as number[];
+    const nextTurn = t + 1;
+    for (const [k, f] of frequencies.entries()) {
+      let newP = p + k;
+      newP = newP % 10;
+      newP = newP == 0 ? 10 : newP;
+      const newScore = s + newP;
+      if (newScore >= 21) {
+        //console.log(newP, newScore, nextTurn, v * f);
+        res.push([newP, newScore, nextTurn, v * f]);
+      } else {
+        que.push([newP, newScore, nextTurn, v * f]);
+      }
+    }
+  }
+
+  return res;
+}
+
+// How much you can advance in a turn (keys) and the number of universes (values).
 function getOptionForDie() {
   const faces = [1, 2, 3];
   const options = [],
@@ -126,5 +262,5 @@ function getOptionForDie() {
   return frequencies;
 }
 
-getOptionForDie();
+const frequencies = getOptionForDie();
 main();

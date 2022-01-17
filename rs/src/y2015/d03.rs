@@ -17,6 +17,7 @@ pub fn main() {
 
     let res2 = solve_part2(&input);
     dbg!(res2);
+    assert_eq!(res, 2639);
     assert_eq!(solve_part2(&String::from("^v")), 3);
     assert_eq!(solve_part2(&String::from("^>v<")), 3);
     assert_eq!(solve_part2(&String::from("^v^v^v^v^v")), 11);
@@ -75,5 +76,4 @@ pub fn solve_part2(input: &String) -> usize {
     }
 
     visited_houses.union(&visited_houses_robot).count()
-
 }

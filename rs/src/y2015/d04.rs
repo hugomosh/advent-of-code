@@ -1,18 +1,23 @@
-use std::{fmt::format, ops::Add};
+use std::{ops::Add, time::Instant};
 
-use md5;
+use crypto::{digest::Digest, md5::Md5};
 
 pub fn main() {
     println!("Aoc Year: 2015 Day: 04");
 
     let input = String::from("bgvyzdsv");
-
-    dbg!(&input[..5]);
-
+    //let input = String::from("bgvyzdsv");
+    //Ramon's input: "iwrupvqb" takes more time
+    dbg!(&input);
+    let mut t = Instant::now();
     let res2 = solve_part2(&input);
-    dbg!(res2);
+    dbg!(t.elapsed().as_millis());
 
+    dbg!(&res2);
+    t = Instant::now();
     let res = solve_part1(&input);
+    dbg!(t.elapsed().as_millis());
+
     dbg!(&res);
 
     let digest2 = md5::compute(b"abcdef609043");
@@ -26,36 +31,34 @@ pub fn main() {
     );
 
     assert_eq!(res, String::from("254575"));
-
-    /*
-    assert_eq!(res, 2639);
-    assert_eq!(solve_part2(&String::from("^v")), 3);
-    assert_eq!(solve_part2(&String::from("^>v<")), 3);
-    assert_eq!(solve_part2(&String::from("^v^v^v^v^v")), 11); */
+    assert_eq!(res2, String::from("1038736"));
 }
 
 pub fn solve_part1(input: &String) -> String {
     let mut i = 0;
-    let mut digest = md5::compute(input.clone().add(&i.to_string()));
+    let mut sh = Md5::new();
+    // clone seems better than &format!("{}{:?}", input, i)
+    sh.input_str(&input.clone().add(&i.to_string()));
 
-    while !format!("{:x}", digest).starts_with("00000") {
+    while !sh.result_str().starts_with("00000") {
+        sh.reset();
         i += 1;
-        digest = md5::compute(input.clone().add(&i.to_string()));
+        sh.input_str(&input.clone().add(&i.to_string()));
     }
-    dbg!(digest);
 
     return i.to_string();
 }
 
 pub fn solve_part2(input: &String) -> String {
     let mut i = 0;
-    let mut digest = md5::compute(input.clone().add(&i.to_string()));
+    let mut sh = Md5::new();
+    sh.input_str(&input.clone().add(&i.to_string()));
 
-    while !format!("{:x}", digest).starts_with("000000") {
+    while !sh.result_str().starts_with("000000") {
+        sh.reset();
         i += 1;
-        digest = md5::compute(input.clone().add(&i.to_string()));
+        sh.input_str(&input.clone().add(&i.to_string()));
     }
-    dbg!(digest);
 
     return i.to_string();
 }

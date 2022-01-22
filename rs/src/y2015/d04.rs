@@ -20,10 +20,6 @@ pub fn main() {
 
     dbg!(&res);
 
-    let digest2 = md5::compute(b"abcdef609043");
-    dbg!(digest2);
-    dbg!(format!("{:x}", digest2).starts_with("00000"));
-
     assert_eq!(solve_part1(&String::from("abcdef")), String::from("609043"));
     assert_eq!(
         solve_part1(&String::from("pqrstuv")),

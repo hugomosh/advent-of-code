@@ -20,3 +20,15 @@ npm start create 2020 1
 ```sh
 npm start run 2020 1
 ```
+
+
+For rust 
+
+```sh
+
+# Live watch with cargo-watch `cargo install cargo-watch`
+cargo watch -x 'run'
+
+# Live watch with nodemon `npm i -g nodemon`
+nodemon --watch src -e rs --exec cargo run --release
+```

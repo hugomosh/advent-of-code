@@ -4,7 +4,7 @@ use itertools::Itertools;
 
 pub fn main() {
     println!("Aoc Year: 2015 Day: 05");
-    let mut t = Instant::now();
+    let mut t: Instant;
 
     let input = std::fs::read_to_string("../input/2015/05.txt").unwrap();
     dbg!(&input[..5]);

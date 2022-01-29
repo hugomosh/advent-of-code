@@ -1,5 +1,6 @@
 use std::{collections::HashMap, ops::Not, time::Instant};
 
+use fxhash::FxBuildHasher;
 use itertools::Itertools;
 
 pub fn main() {
@@ -28,7 +29,8 @@ pub fn main() {
 }
 
 pub fn solve_part1(input: &Vec<Operation>) -> String {
-    let mut wires: HashMap<String, u16> = HashMap::new();
+    let mut wires: HashMap<String, u16, FxBuildHasher> =
+        HashMap::with_hasher(FxBuildHasher::default());
 
     let mut it = input.into_iter().cycle();
 
@@ -48,34 +50,35 @@ pub fn solve_part1(input: &Vec<Operation>) -> String {
         if i1.is_none() {
             continue;
         }
+        let ii1 = i1.unwrap();
         match &op.instruction {
             Instruction::ASSIGN => {
-                wires.insert(op.output.clone(), i1.unwrap());
+                wires.insert(op.output.clone(), ii1);
                 if op.output == "a" {
                     break;
                 }
             }
             Instruction::NOT => {
-                wires.insert(op.output.clone(), i1.unwrap().not());
+                wires.insert(op.output.clone(), ii1.not());
             }
-            _ => {
-                if i2.is_none() {
-                    continue;
-                }
-            }
+            _ => {}
         }
+        if i2.is_none() {
+            continue;
+        }
+        let ii2 = i2.unwrap();
         match &op.instruction {
             Instruction::AND => {
-                wires.insert(op.output.clone(), i1.unwrap() & i2.unwrap());
+                wires.insert(op.output.clone(), ii1 & ii2);
             }
             Instruction::OR => {
-                wires.insert(op.output.clone(), i1.unwrap() ^ i2.unwrap());
+                wires.insert(op.output.clone(), ii1 ^ ii2);
             }
             Instruction::LSHIFT => {
-                wires.insert(op.output.clone(), i1.unwrap() << i2.unwrap());
+                wires.insert(op.output.clone(), ii1 << ii2);
             }
             Instruction::RSHIFT => {
-                wires.insert(op.output.clone(), i1.unwrap() >> i2.unwrap());
+                wires.insert(op.output.clone(), ii1 >> ii2);
             }
             _ => {}
         }
@@ -85,10 +88,11 @@ pub fn solve_part1(input: &Vec<Operation>) -> String {
 }
 
 pub fn solve_part2(input: &Vec<Operation>) -> String {
-    let mut wires: HashMap<String, u16> = HashMap::new();
+    let mut wires: HashMap<String, u16, FxBuildHasher> =
+        HashMap::with_hasher(FxBuildHasher::default());
 
-    let mut it = input.into_iter().cycle();
-
+    let mut it = input.iter().cycle();
+    let solve1 = solve_part1(&input).parse::<u16>().unwrap();
     loop {
         let op = it.next().unwrap();
         let mut i1: Option<u16> = op
@@ -105,37 +109,39 @@ pub fn solve_part2(input: &Vec<Operation>) -> String {
         if i1.is_none() {
             continue;
         }
+        let mut ii1 = i1.unwrap();
         match &op.instruction {
             Instruction::ASSIGN => {
                 if op.output == "b" {
-                    i1 = Some(solve_part1(&input).parse::<u16>().unwrap());
+                    ii1 = solve1;
                 }
-                wires.insert(op.output.clone(), i1.unwrap());
+                wires.insert(op.output.clone(), ii1);
                 if op.output == "a" {
                     break;
                 }
             }
             Instruction::NOT => {
-                wires.insert(op.output.clone(), i1.unwrap().not());
+                wires.insert(op.output.clone(), ii1.not());
             }
-            _ => {
-                if i2.is_none() {
-                    continue;
-                }
-            }
+            _ => {}
         }
+        if i2.is_none() {
+            continue;
+        }
+        let ii2 = i2.unwrap();
+
         match &op.instruction {
             Instruction::AND => {
-                wires.insert(op.output.clone(), i1.unwrap() & i2.unwrap());
+                wires.insert(op.output.clone(), ii1 & ii2);
             }
             Instruction::OR => {
-                wires.insert(op.output.clone(), i1.unwrap() ^ i2.unwrap());
+                wires.insert(op.output.clone(), ii1 ^ ii2);
             }
             Instruction::LSHIFT => {
-                wires.insert(op.output.clone(), i1.unwrap() << i2.unwrap());
+                wires.insert(op.output.clone(), ii1 << ii2);
             }
             Instruction::RSHIFT => {
-                wires.insert(op.output.clone(), i1.unwrap() >> i2.unwrap());
+                wires.insert(op.output.clone(), ii1 >> ii2);
             }
             _ => {}
         }

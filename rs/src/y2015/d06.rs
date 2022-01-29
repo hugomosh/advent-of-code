@@ -52,7 +52,7 @@ pub fn to_operation(l: &str) -> Operation {
             c.get(3).map_or(0, internal_parse),
         ),
         to: (
-            c.get(4).map_or(0, internal_parse),
+            c.get(3).map_or(0, internal_parse),
             c.get(5).map_or(0, internal_parse),
         ),
     }

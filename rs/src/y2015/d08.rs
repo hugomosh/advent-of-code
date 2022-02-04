@@ -57,16 +57,8 @@ pub fn solve_part2(input: Lines) -> String {
             chars.next_back();
 
             while let Some(c) = chars.next() {
-                if c == '\\' {
+                if c == '\\' || c == '"' {
                     y += 1;
-                    let next = chars.next();
-                    if next.eq(&Some('x')) {
-                        y += 3;
-                        chars.next();
-                        chars.next();
-                    } else {
-                        y += 2;
-                    }
                 }
                 y += 1;
             }

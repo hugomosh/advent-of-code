@@ -1,4 +1,4 @@
-use std::{ops::Add, time::Instant};
+use std::time::Instant;
 
 pub fn main() {
     let year = 2015;
@@ -6,7 +6,8 @@ pub fn main() {
     println!("Aoc Year {} Day: {:02}", year, day);
     let mut t: Instant;
 
-    let input = "1113122113".to_string(); // std::fs::read_to_string(format!("../input/{}/{:02}.txt", year, day)).unwrap();
+    //let ramon_input = "1113222113".to_string();
+    let input = "1113122113".to_string();
     dbg!(&input);
 
     t = Instant::now();
@@ -20,30 +21,31 @@ pub fn main() {
     dbg!(&res2);
 }
 
+fn look_and_say(mut original: String) -> String {
+    let mut prev_c;
+    let mut count_c = 0;
+    let mut next_string = String::with_capacity(original.len());
+    original.push('z'); // To avoid pushing the last element manually
+    prev_c = original.chars().next().unwrap();
+    for c in original.chars() {
+        if prev_c == c {
+            count_c += 1;
+        } else {
+            next_string.push_str(&count_c.to_string());
+            next_string.push(prev_c);
+            prev_c = c;
+            count_c = 1;
+        }
+    }
+
+    next_string
+}
+
 fn expand_string(input: &String, times: u32) -> String {
     let mut res = input.clone();
-    let mut prev_c;
-    let mut next_string;
-    let mut count_c;
-    for _i in 0..times {
-        count_c = 0;
-        next_string = "".to_string();
-        prev_c = res.chars().next().unwrap();
-        for c in res.chars() {
-            if prev_c == c {
-                count_c += 1;
-            } else {
-                if count_c > 0 {
-                    next_string.push_str(&count_c.to_string());
-                    next_string.push(prev_c);
-                }
-                prev_c = c;
-                count_c = 1;
-            }
-        }
-        next_string.push_str(&count_c.to_string());
-        next_string.push(prev_c);
-        res = next_string.clone();
+
+    for _ in 0..times {
+        res = look_and_say(res);
     }
     res
 }
@@ -73,11 +75,15 @@ fn test_expand_string() {
 
 #[test]
 fn test_part1() {
-    assert_eq!(solve_part1(&r"1113122113".to_string()), "360154".to_string());
-
+    assert_eq!(
+        solve_part1(&r"1113122113".to_string()),
+        "360154".to_string()
+    );
 }
 #[test]
 fn test_part2() {
-    assert_eq!(solve_part2(&r"1113122113".to_string()), "5103798".to_string());
-
+    assert_eq!(
+        solve_part2(&r"1113122113".to_string()),
+        "5103798".to_string()
+    );
 }

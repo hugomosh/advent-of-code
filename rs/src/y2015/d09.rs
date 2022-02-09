@@ -59,28 +59,37 @@ pub fn solve_part1(input: Lines) -> String {
     let mut solutions: HashMap<String, u32> = HashMap::new();
 
     for first_node in nodes.values() {
+        let mut que_of_edges: HashMap<String, u32>;
         // Start at any node
         let mut visited_nodes: HashMap<String, u32> = HashMap::new();
         visited_nodes.insert(first_node.name.clone(), 0);
-        let mut next_node_name = first_node.name.clone();
-
+        que_of_edges = first_node.edges.clone();
         while visited_nodes.len() != nodes.len() {
             // Pull the shortes edge.
-            let mut min_distance = u32::MIN;
-
-            for (name, distance) in nodes.get(&next_node_name).unwrap().edges.iter() {
-                if visited_nodes.contains_key(name) {
-                    continue;
-                }
-                if *distance > min_distance {
+            let mut min_distance = u32::MAX;
+            let mut next_node = "".to_string();
+            for (name, distance) in que_of_edges.iter() {
+                if *distance < min_distance {
                     min_distance = *distance;
-                    next_node_name = name.clone();
+                    next_node = name.clone();
                 }
             }
-
-
+     
             //Add node to visited
-            visited_nodes.insert(next_node_name.clone(), min_distance);
+            que_of_edges.remove(&next_node);
+            visited_nodes.insert(next_node.clone(), min_distance);
+
+            // Add to queue all posibles edges
+            for ele in nodes.get(&next_node).unwrap().edges.iter() {
+                if visited_nodes.contains_key(ele.0) {
+                    continue;
+                }
+                let i = que_of_edges.insert(ele.0.clone(), *ele.1);
+
+                if i.is_some() {
+                    que_of_edges.insert(ele.0.clone(), u32::min(*ele.1, i.unwrap()));
+                }
+            }
         }
         dbg!(visited_nodes.values().fold(0, |acc, &x| acc + x));
         solutions.insert(

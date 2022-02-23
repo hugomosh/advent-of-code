@@ -23,6 +23,7 @@ pub fn main() {
 
 fn look_and_say(mut original: String) -> String {
     let mut prev_c;
+
     let mut count_c = 0;
     let mut next_string = String::with_capacity(original.len());
     original.push('z'); // To avoid pushing the last element manually
@@ -40,7 +41,6 @@ fn look_and_say(mut original: String) -> String {
 
     next_string
 }
-
 fn expand_string(input: &String, times: u32) -> String {
     let mut res = input.clone();
 

@@ -38,3 +38,23 @@ pub fn solve_part2(input: &String) -> String {
 
     return i.to_string();
 }
+
+
+#[test]
+fn test_solve1() {
+    let case1 = &r#"R5, L5, R5, R3"#.to_string();
+
+    assert_eq!(
+        solve_part1(),
+        "12".to_string()
+    );
+}
+#[test]
+fn test_solve2() {
+    let case2 = &r#"R8, R4, R4, R8"#.to_string();
+
+    assert_eq!(
+        solve_part2(&r#"R8, R4, R4, R8"#.to_string()),
+        "4".to_string()
+    );
+}

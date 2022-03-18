@@ -49,7 +49,7 @@ pub fn solve_part1(input: Lines) -> String {
 
         let to_v = nodes.entry(to.clone()).or_insert(Nodes {
             name: (&to).to_string(),
-            edges: HashMap::new(),djsg
+            edges: HashMap::new(),
         });
 
         // Instert edge in the corresponding place

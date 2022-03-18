@@ -32,3 +32,5 @@ cargo watch -x 'run'
 # Live watch with nodemon `npm i -g nodemon`
 nodemon --watch src -e rs --exec cargo run --release
 ```
+
+With **cargo-watch** instead: `cargo install cargo-watch`

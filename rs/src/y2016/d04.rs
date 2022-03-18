@@ -2,13 +2,13 @@ use std::{collections::HashSet, time::Instant};
 
 pub fn main() {
     let year = 2016;
-    let day = 01;
+    let day = 4;
     println!("Aoc Year {} Day: {:02}", year, day);
     let mut t: Instant;
 
     let input = std::fs::read_to_string(format!("../input/{}/{:02}.txt", year, day)).unwrap();
     dbg!(&input[..13]);
-
+ 
     t = Instant::now();
     let res = solve_part1(&input);
     dbg!(t.elapsed().as_micros());

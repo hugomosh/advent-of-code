@@ -102,12 +102,11 @@ pub fn solve_part2(input: &Vec<Room>) -> String {
         let mut d: HashMap<char, char> = HashMap::new();
 
         for l in ASCII_LOWER.iter().enumerate() {
-            //dbg!();
             d.insert(*l.1, *ASCII_LOWER.get((l.0 + rotate) % 26).unwrap_or(&'.'));
         }
 
-        let s: Vec<String> = x.text.split("-").map(|word| decrypt(word, &d)).collect();
-        dbg!(&s.join(" "));
+        let s: Vec<String> = x.text.split("-").map(|word| decrypt(word, &d)).collect().join(" ");
+        //dbg!(&s.join(" "));
         if s.eq(&goal) {
             return x.sector_id.clone();
         }

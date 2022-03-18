@@ -5,5 +5,5 @@ fn main() {
 
     // let s = include_str!("input.txt");
 
-    y2016::d01::main();
+    y2016::d04::main();
 }

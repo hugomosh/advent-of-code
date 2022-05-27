@@ -1,9 +1,9 @@
-mod y2017;
+mod y2016;
 
 fn main() {
     println!("Hello, aoc!");
 
     // let s = include_str!("input.txt");
 
-    y2017::d01::main();
+    y2016::d05::main();
 }

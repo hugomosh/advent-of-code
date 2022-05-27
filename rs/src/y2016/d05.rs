@@ -13,10 +13,10 @@ pub fn main() {
     let input = "abbhdwsy".to_string(); //std::fs::read_to_string(format!("../input/{}/{:02}.txt", YEAR, DAY)).unwrap();
     dbg!(&input);
 
-    /*   t = Instant::now();
+    t = Instant::now();
     let res = solve_part1(&input);
     dbg!(t.elapsed().as_micros());
-    dbg!(&res); */
+    dbg!(&res);
 
     t = Instant::now();
     let res2 = solve_part2(&input);
@@ -34,14 +34,20 @@ pub fn solve_part1(input: &String) -> String {
         let new_hash = sh.result_str();
 
         if new_hash.starts_with("00000") {
-            dbg!(&new_hash);
             res.push_str(&new_hash.chars().nth(5).unwrap().to_string());
-            dbg!(&res);
+            print!("\rDeciphering {:<8}. {}, {}", res, i, new_hash);
         }
-
+        if i % 100 == 0 {
+            print!("\rDeciphering {:<8}. {}, {}", res, i, new_hash);
+            io::stdout().flush().unwrap();
+        }
         i += 1;
         sh.reset();
     }
+    println!(
+        "\rDeciphering {:<8}. {} Completed                       ",
+        res, i
+    );
     return res;
 }
 
@@ -56,24 +62,31 @@ pub fn solve_part2(input: &String) -> String {
         let new_hash = sh.result_str();
 
         if new_hash.starts_with("00000") {
-           
-            let index = *(&new_hash.chars().nth(5).unwrap()) as usize - '0' as usize;
+            let index = *(&new_hash.chars().nth(5).unwrap()) as usize - '0' as usize; 
 
             let new_char = &new_hash.chars().nth(6).unwrap().to_string();
 
             if index < 8 && res.chars().nth(index).unwrap() == '_' {
-                dbg!(&new_hash, &index, &new_char);
+                //dbg!(&new_hash, &index, &new_char);
                 res.replace_range(index..index + 1, &new_char);
                 //dbg!(&res);
                 count += 1;
-                io::stdout().flush().unwrap();
+                print!("\rDeciphering {}. {}, {}", res, i, new_hash);
             }
         }
-        print!("\rDeciphering {}. {}, {}", res, i, new_hash);
-
+        // Ineficient  print!("\rDeciphering {}. {:0>10}, {}", res, i, new_hash);
+        if i % 10000 == 0 {
+            print!("\rDeciphering {}. {}, {}", res, i, new_hash);
+            io::stdout().flush().unwrap();
+        }
         i += 1;
         sh.reset();
     }
+    println!(
+        "\rDeciphering {}. {} Completed                      ",
+        res, i
+    );
+
     return res;
 }
 

@@ -86,7 +86,6 @@ function solvePart2(input: any): string {
 
   let res = containers.map((l) => l[0]);
   console.log(res.join(""));
-  //parseInt(gamma.join(""), 2)
 
   return res.join("");
 }

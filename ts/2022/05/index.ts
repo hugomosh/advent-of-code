@@ -5,14 +5,36 @@ const problem = {
   year: config.year,
   day: config.day,
   doTest: true,
-  expectedT1: 123,
-  expectedT2: 789,
-  part1Done: false,
-  part2Done: false,
+  expectedT1: "CMZ",
+  expectedT2: "MCD",
+  part1Done: "ZSQVCCJLL",
+  part2Done: "QZFJRWHGS",
 };
 
 const parseInput = (input: string) => {
-  return input.split("\n");
+  let [cargoSt, movesSt] = input.split("\n\n");
+  let cargo = cargoSt.split("\n");
+  cargo.pop();
+  let containers: any[][] = [...Array(9)].map((x) => []);
+  cargo.forEach((l) => {
+    let i = 0;
+    for (let w = 0; w < l.length; w = w + 4) {
+      const element = l.slice(w + 1, w + 2);
+      if (element != " ") {
+        containers[i].push(element);
+      }
+      i++;
+    }
+  });
+  const myRe = /move (\d+) from (\d+) to (\d+)/;
+  const moves = movesSt
+    .split("\n")
+    .filter((l) => l != "")
+    .map((m) => m.match(myRe)?.slice(1, 4).map(Number));
+  console.log(JSON.stringify(containers));
+  console.log(moves);
+
+  return [containers, moves];
   // .filter(l=>l!="");
 };
 
@@ -22,14 +44,26 @@ const part1 = () => {
   return solvePart1(input);
 };
 
-function solvePart1(input: any): number {
+function solvePart1(input: any): string {
   console.info(`Solving part 1. ${problem.year}/12/${problem.day}`);
   const len = input.length;
-  console.info({ len, input });
-  let res = 987;
+  const [containers, moves]: [any[][], [number, number, number][]] = input;
+  console.log({ containers });
+
+  moves.forEach((m: [number, number, number]) => {
+    console.log(m);
+    for (let i = 0; i < m[0]; i++) {
+      const element = containers[m[1] - 1].shift();
+      containers[m[2] - 1].unshift(element);
+    }
+  });
+  console.log({ containers });
+
+  let res = containers.map((l) => l[0]);
+  console.log(res.join(""));
   //parseInt(gamma.join(""), 2)
 
-  return res;
+  return res.join("");
 }
 
 /* ----------------------------   Part 2  ------------------------------*/
@@ -39,12 +73,22 @@ const part2 = () => {
   return solvePart2(input);
 };
 
-function solvePart2(input: any): number {
-  const len = input[0].length;
-  console.info({ len, input });
-  let res2 = 123;
+function solvePart2(input: any): string {
+  const len = input.length;
+  const [containers, moves]: [any[][], [number, number, number][]] = input;
+  console.log({ containers });
 
-  return res2;
+  moves.forEach((m: [number, number, number]) => {
+    const element = containers[m[1] - 1].splice(0, m[0]);
+    containers[m[2] - 1] = [...element, ...containers[m[2] - 1]];
+  });
+  console.log({ containers });
+
+  let res = containers.map((l) => l[0]);
+  console.log(res.join(""));
+  //parseInt(gamma.join(""), 2)
+
+  return res.join("");
 }
 
 const testPart1 = (): boolean => {

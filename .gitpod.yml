@@ -6,8 +6,11 @@ image:
   file: .gitpod.Dockerfile
   
 tasks:
-  - init: npm install && npm i -g nodemon
+  - name: Terminal 1
+    init: npm install && npm i -g nodemon
     command: npm run start
+  - name: Terminal 2
+    init: sdk install kotlin
 
 vscode:
   extensions:

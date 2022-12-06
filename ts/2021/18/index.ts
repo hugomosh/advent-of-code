@@ -13,9 +13,7 @@ const problem = {
   part2Done: false,
 };
 
-
 type D = [number | D, number | D];
-
 
 class SnailFish {
   original: string;
@@ -28,11 +26,10 @@ class SnailFish {
   getMagnitud(): number {
     const mult = [3, 2];
     let m = 0;
-
     const getM = (v: D | number): number => {
       if (typeof v == "number") return v;
       return mult[0] * getM(v[0]) + mult[1] * getM(v[1]);
-    }
+    };
 
     return getM(this.value);
   }
@@ -51,10 +48,7 @@ class SnailFish {
   }
 
   needsExplode(): number[] {
-    const que = [
-      [1],
-      [0],
-    ];
+    const que = [[1], [0]];
     while (que.length > 0) {
       const path = que.pop()!;
       let v: D | number = this.getVofPath(path);
@@ -81,15 +75,13 @@ class SnailFish {
       if (i != path.length - 1) {
         if (typeof v != "number") {
           v = v[element];
-        }
-        else {
+        } else {
           console.error("No path2");
         }
       } else {
         if (typeof v != "number") {
           v[element] = newV;
-        }
-        else {
+        } else {
           console.error("No path3");
         }
       }
@@ -97,30 +89,35 @@ class SnailFish {
   }
 
   getNumberOfV(v: number | D, isLeft?: boolean): number {
-    if (typeof v == "number")
-      return v;
+    if (typeof v == "number") return v;
     return this.getNumberOfV(v[isLeft ? 0 : 1], isLeft);
   }
 
   explode(t: number[]) {
-    let toRigth = (parseInt(t.join(""), 2) + 1);
+    let toRigth = parseInt(t.join(""), 2) + 1;
     if (toRigth < 16) {
-      const pathF = toRigth.toString(2).padStart(4, '0').split("").map(Number);
+      const pathF = toRigth.toString(2).padStart(4, "0").split("").map(Number);
       const vR = this.getVofPath(pathF);
       let valueR = this.getVofPath([...t, 1]);
 
       if (typeof vR != "number") {
         pathF.push(0);
       }
-      this.replaceV(pathF, this.getNumberOfV(vR, true) + this.getNumberOfV(valueR, true));
+      this.replaceV(
+        pathF,
+        this.getNumberOfV(vR, true) + this.getNumberOfV(valueR, true)
+      );
     }
 
-    let toLeft = (parseInt(t.join(""), 2) - 1);
+    let toLeft = parseInt(t.join(""), 2) - 1;
     if (toLeft >= 0) {
-      const pathF = toLeft.toString(2).padStart(4, '0').split("").map(Number);
+      const pathF = toLeft.toString(2).padStart(4, "0").split("").map(Number);
       const vL = this.getVofPath(pathF);
       let valueL = this.getVofPath([...t, 0]);
-      this.replaceV(pathF, this.getNumberOfV(vL, false) + this.getNumberOfV(valueL, false));
+      this.replaceV(
+        pathF,
+        this.getNumberOfV(vL, false) + this.getNumberOfV(valueL, false)
+      );
     }
 
     this.replaceV(t, 0);
@@ -128,16 +125,13 @@ class SnailFish {
 
   split(t: number[]) {
     let v = this.getNumberOfV(this.getVofPath(t));
-    const vl = Math.floor(v / 2), vr = Math.ceil(v / 2);
+    const vl = Math.floor(v / 2),
+      vr = Math.ceil(v / 2);
     this.replaceV(t, [vl, vr]);
-
   }
 
   needsSplit(): number[] {
-    const que = [
-      [1],
-      [0],
-    ];
+    const que = [[1], [0]];
     while (que.length > 0) {
       const path = que.pop()!;
       let v: D | number = this.getVofPath(path);
@@ -158,7 +152,8 @@ class SnailFish {
 
   add(s: SnailFish): SnailFish {
     const ss = new SnailFish(`[${this.toString()},${s.toString()}]`);
-    let et = [], es = [];
+    let et = [],
+      es = [];
     do {
       et = ss.needsExplode();
       if (et.length > 0) {
@@ -180,13 +175,11 @@ class SnailFish {
   toString() {
     const getS = (v: D | number): string => {
       if (typeof v == "number") return `${v}`;
-      return `[${getS(v[0])
-        },${getS(v[1])}]`;
-    }
+      return `[${getS(v[0])},${getS(v[1])}]`;
+    };
     return getS(this.value);
   }
 }
-
 
 const testMagnitud = () => {
   console.info("testMagnitud");
@@ -202,20 +195,28 @@ const testMagnitud = () => {
     const s = new SnailFish(e.s);
     const actual = s.getMagnitud();
     const res = actual === e.res;
-    res ? '' : console.log({ res, actual, s });
+    res ? "" : console.log({ res, actual, s });
   }
-}
+};
 
 const testExplode = () => {
-
   const examples = [
-    { s: '[[[[0,[3,2]],[3,3]],[4,4]],[5,5]]', e: '[[[[3,0],[5,3]],[4,4]],[5,5]]' },
-    { s: '[[[[[9,8],1],2],3],4]', e: '[[[[0,9],2],3],4]' },
-    { s: '[[[[[9,8],[1,2]],2],3],4]', e: '[[[[0,[9,2]],2],3],4]' },
-    { s: '[7,[6,[5,[4,[3,2]]]]]', e: '[7,[6,[5,[7,0]]]]' },
-    { s: '[[6,[5,[4,[3,2]]]],1]', e: '[[6,[5,[7,0]]],3]' },
-    { s: '[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]', e: '[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]' },
-    { s: '[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]', e: '[[3,[2,[8,0]]],[9,[5,[7,0]]]]' },
+    {
+      s: "[[[[0,[3,2]],[3,3]],[4,4]],[5,5]]",
+      e: "[[[[3,0],[5,3]],[4,4]],[5,5]]",
+    },
+    { s: "[[[[[9,8],1],2],3],4]", e: "[[[[0,9],2],3],4]" },
+    { s: "[[[[[9,8],[1,2]],2],3],4]", e: "[[[[0,[9,2]],2],3],4]" },
+    { s: "[7,[6,[5,[4,[3,2]]]]]", e: "[7,[6,[5,[7,0]]]]" },
+    { s: "[[6,[5,[4,[3,2]]]],1]", e: "[[6,[5,[7,0]]],3]" },
+    {
+      s: "[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]",
+      e: "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]",
+    },
+    {
+      s: "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]",
+      e: "[[3,[2,[8,0]]],[9,[5,[7,0]]]]",
+    },
   ];
   for (const e of examples) {
     const s = new SnailFish(e.s);
@@ -223,16 +224,21 @@ const testExplode = () => {
     s.explode(t);
     const actual = s.toString();
     const res = actual === e.e;
-    res ? '' : console.log({ s, t, ex: e.e, ac: actual });
+    res ? "" : console.log({ s, t, ex: e.e, ac: actual });
   }
-}
+};
 //testExplode();
 
 const testSplit = () => {
   const examples = [
-    { s: '[[[[0,7],4],[15,[0,13]]],[1,1]]', e: '[[[[0,7],4],[[7,8],[0,13]]],[1,1]]' },
-    { s: '[[[[0,7],4],[[7,8],[0,13]]],[1,1]]', e: '[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]' },
-
+    {
+      s: "[[[[0,7],4],[15,[0,13]]],[1,1]]",
+      e: "[[[[0,7],4],[[7,8],[0,13]]],[1,1]]",
+    },
+    {
+      s: "[[[[0,7],4],[[7,8],[0,13]]],[1,1]]",
+      e: "[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]",
+    },
   ];
   for (const e of examples) {
     const s = new SnailFish(e.s);
@@ -240,11 +246,11 @@ const testSplit = () => {
     s.split(t);
     const actual = s.toString();
     const res = actual === e.e;
-    res ? '' : console.log({ s, t, ex: e.e, ac: actual });
+    res ? "" : console.log({ s, t, ex: e.e, ac: actual });
   }
-}
+};
 const parseInput = (input: string) => {
-  return input.split("\n").filter(x => x != "");
+  return input.split("\n").filter((x) => x != "");
 };
 
 const part1 = () => {
@@ -274,7 +280,6 @@ function solvePart1(input: any): number {
     } else {
       currentS = currentS.add(s);
     }
-
   }
   let res = currentS!.getMagnitud();
   //parseInt(gamma.join(""), 2)
@@ -288,7 +293,8 @@ function solvePart2(input: any): number {
   const len = input[0].length;
 
   console.info({ len, input });
-  let currentS: SnailFish | undefined, max = 0;
+  let currentS: SnailFish | undefined,
+    max = 0;
   for (let i = 0; i < input.length; i++) {
     const element = input[i];
 
@@ -301,10 +307,7 @@ function solvePart2(input: any): number {
       if (m > max) {
         max = m;
       }
-
-
     }
-
   }
   //parseInt(gamma.join(""), 2)
 
@@ -342,7 +345,9 @@ const testPart2 = () => {
 
 function main() {
   console.info(`------------------------------------------------------------`);
-  console.info(`🎄 Running Advent of Code ${problem.year} Day: ${problem.day} `);
+  console.info(
+    `🎄 Running Advent of Code ${problem.year} Day: ${problem.day} `
+  );
   if (!problem.part1Done) {
     if (!problem.doTest || testPart1()) {
       console.info(`Solution 1️⃣: ${part1()} `);

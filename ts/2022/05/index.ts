@@ -15,7 +15,9 @@ const parseInput = (input: string) => {
   let [cargoSt, movesSt] = input.split("\n\n");
   let cargo = cargoSt.split("\n");
   cargo.pop();
-  let containers: any[][] = [...Array(9)].map((x) => []);
+  let containers: any[][] = [...Array((cargo[0].length + 1) / 4)].map(
+    (x) => []
+  );
   cargo.forEach((l) => {
     let i = 0;
     for (let w = 0; w < l.length; w = w + 4) {
@@ -44,24 +46,48 @@ const part1 = () => {
   return solvePart1(input);
 };
 
+const containersToString = (containers: any[][]): string => {
+  let r = [""];
+  const maxHeight = Math.max(...containers.map((c) => c.length));
+  console.log({ maxHeight });
+  for (let i = 0; i < containers.length; i++) {
+    r[0] += `  ${i + 1}  `;
+  }
+  for (let h = 0; h < maxHeight; h++) {
+    let s = "";
+    for (let i = 0; i < containers.length; i++) {
+      const element = containers[i];
+      if (h < element.length) {
+        s += ` [${element[element.length - h - 1]}] `;
+      } else {
+        s += `     `;
+      }
+    }
+    r.unshift(s);
+  }
+
+  return r.join("\n");
+};
+
 function solvePart1(input: any): string {
   console.info(`Solving part 1. ${problem.year}/12/${problem.day}`);
   const len = input.length;
   const [containers, moves]: [any[][], [number, number, number][]] = input;
-  console.log({ containers });
+  console.log(containersToString(containers));
 
   moves.forEach((m: [number, number, number]) => {
-    console.log(m);
     for (let i = 0; i < m[0]; i++) {
       const element = containers[m[1] - 1].shift();
       containers[m[2] - 1].unshift(element);
     }
+    /*     console.clear();
+    console.log(containersToString(containers));
+    console.log(m) */
   });
-  console.log({ containers });
+  console.log(containersToString(containers));
 
   let res = containers.map((l) => l[0]);
   console.log(res.join(""));
-  //parseInt(gamma.join(""), 2)
 
   return res.join("");
 }

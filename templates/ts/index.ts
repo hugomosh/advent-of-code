@@ -11,15 +11,13 @@ const problem = {
   part2Done: false,
 };
 
-const parseInput = (input: string) => {
-  return input.split("\n");
-  // .filter(l=>l!="");
-};
+const testCases = [
+  [``, 0],
+  [``, 0],
+];
 
-const part1 = () => {
-  const parse = getInput(problem.year, problem.day);
-  const input = parseInput(parse);
-  return solvePart1(input);
+const parseInput = (input: string) => {
+  return input.split("\n").filter((l) => l != "");
 };
 
 function solvePart1(input: any): number {
@@ -33,11 +31,6 @@ function solvePart1(input: any): number {
 }
 
 /* ----------------------------   Part 2  ------------------------------*/
-const part2 = () => {
-  const parse = getInput(problem.year, problem.day);
-  const input = parseInput(parse);
-  return solvePart2(input);
-};
 
 function solvePart2(input: any): number {
   const len = input[0].length;
@@ -46,6 +39,19 @@ function solvePart2(input: any): number {
 
   return res2;
 }
+
+const part1 = () => {
+  const parse = getInput(problem.year, problem.day);
+  const input = parseInput(parse);
+  return solvePart1(input);
+};
+const part2 = () => {
+  const parse = getInput(problem.year, problem.day);
+  const input = parseInput(parse);
+  return solvePart2(input);
+};
+
+/* ----------------------------   Tests   ------------------------------*/
 
 const testPart1 = (): boolean => {
   const input = readTestInputFile(problem.year, problem.day);

@@ -20,12 +20,37 @@ const parseInput = (input: string) => {
   return input.split("\n").filter((l) => l != "");
 };
 
+class Folder {
+  path: string;
+  files: string[];
+  children: Set<Folder>;
+  size: number;
+}
+
 function solvePart1(input: any): number {
   console.info(`Solving part 1. ${problem.year}/12/${problem.day}`);
   const len = input.length;
   console.info({ len, input });
+
+  const tree: any = {};
+  const root = new Folder();
+  root.path = "/";
+  for (let i = 0; i < input.length; i++) {
+    const [e, d] = input[i].split(" ");
+    switch (e) {
+      case "cd":
+        if (d == "..") {
+        } else {
+        }
+        break;
+      case "ls":
+        break;
+
+      default:
+        break;
+    }
+  }
   let res = 987;
-  //parseInt(gamma.join(""), 2)
 
   return res;
 }

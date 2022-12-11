@@ -11,32 +11,6 @@ const problem = {
   part2Done: 28244037010,
 };
 
-const modularMultiplicativeInverse = (a: bigint, modulus: bigint) => {
-  // Calculate current value of a mod modulus
-  const b = BigInt(a % modulus);
-
-  // We brute force the search for the smaller hipothesis, as we know that the number must exist between the current given modulus and 1
-  for (let hipothesis = 1n; hipothesis <= modulus; hipothesis++) {
-    if ((b * hipothesis) % modulus == 1n) return hipothesis;
-  }
-  // If we do not find it, we return 1
-  return 1n;
-};
-
-const solveCRT = (remainders: bigint[], modules: bigint[]) => {
-  // Multiply all the modulus
-  const prod: bigint = modules.reduce((acc: bigint, val) => acc * val, 1n);
-
-  return (
-    modules.reduce((sum, mod, index) => {
-      // Find the modular multiplicative inverse and calculate the sum
-      // SUM( remainder * productOfAllModulus/modulus * MMI ) (mod productOfAllModulus)
-      const p = prod / mod;
-      return sum + remainders[index] * modularMultiplicativeInverse(p, mod) * p;
-    }, 0n) % prod
-  );
-};
-
 const testCases = [
   [``, 0],
   [``, 0],
@@ -46,18 +20,18 @@ const mRegex =
   /Monkey (\d+):\n[\s]+Starting items: (.*)\n[\s]+Operation: (.*)\n[\s]+Test: divisible by (\d+)\n[\s]+If true: throw to monkey (\d+)\n[\s]+If false: throw to monkey (\d+)/;
 
 class Item {
-  level: bigint;
+  level: number;
   constructor(level: number) {
-    this.level = BigInt(level);
+    this.level = level;
   }
 }
 class Monkey {
   id: number;
   items: Item[];
-  operation: (x: bigint) => bigint;
-  test: (x: bigint) => number;
+  operation: (x: number) => number;
+  test: (x: number) => number;
   inspected = 0;
-  div: bigint;
+  div: number;
 
   constructor(m: string) {
     console.log({ m });
@@ -65,31 +39,25 @@ class Monkey {
     console.log(m.match(mRegex));
     m.split("\n");
     this.id = Number(match[1]);
-    this.div = BigInt(match[4]);
     this.items = match[2]
       .split(",")
       .map(Number)
       .map((x) => new Item(x));
-    const op = match[3].replace("new", "res").split(" ");
-    console.log({ op });
-    this.operation = (old: bigint) => {
+    const op = match[3].replace("new", "res");
+    this.operation = (old: number) => {
       let res = old;
-      let second = op[4] == "old" ? res : BigInt(op[4]);
-      if (op[3] == "*") {
-        res = old * second;
-      } else {
-        res = old + second;
-      }
-
+      eval(op);
       return res;
     };
-    this.test = (x: bigint): number => {
-      if (x % this.div == BigInt(0)) {
+    this.div = Number(match[4]);
+    this.test = (x: number): number => {
+      if (x % Number(match[4]) == 0) {
         return Number(match[5]);
       } else {
         return Number(match[6]);
       }
     };
+    console.log(this.items);
   }
 }
 
@@ -115,6 +83,7 @@ function solvePart1(input: any): number {
         item.level = monkey.operation(item.level);
         item.level = Math.floor(item.level / 3);
         const nextMonkey = monkey.test(item.level);
+        console.log({ item, nextMonkey });
         input[nextMonkey].items.push(item);
       }
     }
@@ -133,15 +102,11 @@ function solvePart2(input: any): number {
     `One ⭐️ to go. Solving part 2. ${problem.year}/12/${problem.day}`
   );
 
-  const len = input.length;
-  /* const mm = solveCRT(
-    input.map((x: Monkey) => 0n),
-    input.map((x: Monkey) => x.div)
-  ); */
-  const mm: bigint = input
+  const lcm = input
     .map((x: Monkey) => x.div)
-    .reduce((acc: bigint, val: bigint) => acc * val, 1n);
-  console.log({ mm });
+    .reduce((a: number, b: number) => a * b, 1);
+  console.log({ lcm });
+  const len = input.length;
   for (let i = 0; i < 10000; i++) {
     for (let j = 0; j < input.length; j++) {
       const monkey = input[j];
@@ -150,15 +115,12 @@ function solvePart2(input: any): number {
         monkey.inspected++;
         const item = monkey.items.shift();
         item.level = monkey.operation(item.level);
-        item.level = item.level % mm;
+        item.level = item.level % lcm;
         const nextMonkey = monkey.test(item.level);
         input[nextMonkey].items.push(item);
       }
     }
-    console.log(
-      i,
-      input.map((x: Monkey) => x.inspected)
-    );
+    console.log(i);
   }
   let res = input.map((x: Monkey) => x.inspected);
   res.sort((a: number, b: number) => b - a);

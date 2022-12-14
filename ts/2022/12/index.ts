@@ -8,7 +8,7 @@ const problem = {
   expectedT1: 31,
   expectedT2: 29,
   part1Done: 408,
-  part2Done: false,
+  part2Done: 399,
 };
 
 const testCases = [

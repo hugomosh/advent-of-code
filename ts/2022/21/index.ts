@@ -9,7 +9,7 @@ const problem = {
   expectedT1: 152,
   expectedT2: 301,
   part1Done: 159591692827554,
-  part2Done: false,
+  part2Done: 3509819803065,
 };
 
 const testCases = [

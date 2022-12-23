@@ -4,11 +4,11 @@ import { config } from "./config";
 const problem = {
   year: config.year,
   day: config.day,
-  doTest: false,
+  doTest: 1,
   expectedT1: 26,
   expectedT2: 56000011,
   part1Done: 5142231,
-  part2Done: false,
+  part2Done: 10884459367718,
 };
 
 const testCases = [
@@ -81,11 +81,10 @@ In the example above, the search space is smaller: instead,
 the x and y coordinates can each be at most 20. With this reduced search area, 
 there is only a single position that could have a beacon: x=14, y=11. The tuning frequency for this distress beacon is 56000011.
  */
-function solvePart2(input: any): number {
+function solvePart2(input: any, signal: number = 4000000): number {
   console.info(
     `One ⭐️ to go. Solving part 2. ${problem.year}/12/${problem.day}`
   );
-  const signal = 4000000;
 
   const m: Set<string> = new Set();
 
@@ -96,30 +95,37 @@ function solvePart2(input: any): number {
     const d = manhattan(s, b);
     return [s, b, d];
   });
-  console.log(r);
-  for (let x = 0; x <= signal; x++) {
-    for (let y = 0; y <= signal; y++) {}
-  }
-  const beacons: Set<string> = new Set();
 
-  // console.log(s, b, d);
+  // I will go over the extender perimeter, +/- 1,
+  // of each scanner and then see if each point is beyond the area for each scanner (pointDistance>d foreach S)
 
-  /*   let c = 1;
-
-    for (let j = Math.min(s[1] - d, 0); j <= Math.max(s[1] + d, signal); j++) {
-      for (
-        let i = Math.min(s[0] - d, 0);
-        i <= Math.max(s[0] + d, signal);
-        i++
-      ) {
-        const e: coord = [s[0] - d + i, s[1] - d + j];
-        const nd = manhattan(s, e);
-        if (nd <= d) {
-          m.delete(e.join(","));
+  for (const [s, _, d] of r) {
+    console.log(s, d);
+    for (let p = 0; p <= d + 1; p++) {
+      // p is the perimeter d +1
+      for (const vx of [-1, 1]) {
+        for (const vy of [-1, 1]) {
+          const dx = vx * p;
+          const dy = vy * (d + 1 - p);
+          const x = s[0] + dx;
+          const y = s[1] + dy;
+          if (
+            x >= 0 &&
+            x <= signal &&
+            y >= 0 &&
+            y <= signal &&
+            unreachableByAllScanners(x, y, r)
+          ) {
+            console.log(x, y);
+            return x * 4000000 + y;
+          }
         }
       }
-    } 
-  }*/
+    }
+  }
+
+  const beacons: Set<string> = new Set();
+
   console.log("m");
   console.log(m);
 
@@ -128,6 +134,15 @@ function solvePart2(input: any): number {
   console.log("res");
 
   return res.length;
+}
+
+function unreachableByAllScanners(x: number, y: number, m: any): boolean {
+  for (let [s, _, d] of m) {
+    if (manhattan(s, [x, y]) <= d) {
+      return false;
+    }
+  }
+  return true;
 }
 
 const part1 = () => {
@@ -164,7 +179,7 @@ const testPart2 = () => {
   const parsed = parseInput(input);
 
   const expected = problem.expectedT2;
-  const actual = solvePart2(parsed);
+  const actual = solvePart2(parsed, 20);
   const result = actual === expected;
   result
     ? console.info("2️⃣ ✅", actual)

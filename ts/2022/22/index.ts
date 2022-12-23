@@ -121,7 +121,7 @@ function solvePart2(input: any): number {
         j++;
       } else if (nextPos[1] < 0) {
       } else if (nextPos[1] >= m[0].length) {
-        nextPos= 
+       // nextPos = 
         j++;
       } else {
         changeSide = false;
